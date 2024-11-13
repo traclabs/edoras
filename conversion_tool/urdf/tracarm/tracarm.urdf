@@ -1,0 +1,364 @@
+<?xml version="1.0"?>
+<robot name="tracarm">
+
+  <material name="blue">
+    <color rgba="0 0 .8 1"/>
+  </material>
+
+  <link name="world"/>
+  
+  <link name="deck_link"/>
+
+  <joint name="base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="world"/>
+    <child link="deck_link"/>
+  </joint>
+  
+  <joint name="arm_uma_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.155 0.21 0"/>
+    <parent link="deck_link"/>
+    <child link="arm_uma_link"/>
+  </joint>
+
+  <link name="arm_uma_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/uma.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/uma.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="arm_uma_base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.01"/>
+    <parent link="arm_uma_link"/>
+    <child link="arm_base_roll_stationary_link"/>
+  </joint>
+
+
+  <link name="arm_base_roll_stationary_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/base_roll_stationary.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/base_roll_stationary.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <joint name="joint0" type="revolute">
+    <limit effort="244.5" lower="-2.181659722222222" upper=".7524547222222218" velocity="0.24434588888888886"/>
+    <parent link="arm_base_roll_stationary_link"/>
+    <child link="arm_base_roll_revolving_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.1011"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+ 
+  <link name="arm_base_roll_revolving_link">
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/base_roll_revolving.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/base_roll_revolving.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="arm_base_to_shoulder_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.1284"/>
+    <parent link="arm_base_roll_revolving_link"/>
+    <child link="arm_shoulder_pitch_stationary_link"/>
+  </joint>
+  
+  <link name="arm_shoulder_pitch_stationary_link">
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/shoulder_pitch_stationary.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/shoulder_pitch_stationary.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="joint1" type="revolute">
+    <limit effort="244.5" lower="-1.9809470277777779" upper="1.9809470277777779" velocity="0.26179916666666664"/>
+    <parent link="arm_shoulder_pitch_stationary_link"/>
+    <child link="arm_shoulder_pitch_revolving_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.104"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <link name="arm_shoulder_pitch_revolving_link">
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/shoulder_pitch_revolving.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/shoulder_pitch_revolving.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="arm_shoulder_to_shoulder_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.0975"/>
+    <parent link="arm_shoulder_pitch_revolving_link"/>
+    <child link="arm_shoulder_roll_stationary_link"/>
+  </joint>
+
+  <link name="arm_shoulder_roll_stationary_link">
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/shoulder_roll_stationary.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"/>
+      <geometry>
+          <mesh filename="package://brash_application_tools/meshes/tracarm/shoulder_roll_stationary.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="joint2" type="revolute">
+    <limit effort="123.6" lower="-2.1554798055555553" upper="3.7262748055555557" velocity="0.2792524444444444"/>
+    <parent link="arm_shoulder_roll_stationary_link"/>
+    <child link="arm_shoulder_roll_revolving_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.087063"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  
+  <link name="arm_shoulder_roll_revolving_link">
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/shoulder_roll_revolving.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/shoulder_roll_revolving.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="arm_shoulder_to_elbow_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.138212"/>
+    <parent link="arm_shoulder_roll_revolving_link"/>
+    <child link="arm_elbow_pitch_stationary_link"/>
+  </joint>
+  
+  <link name="arm_elbow_pitch_stationary_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/elbow_pitch_stationary.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/elbow_pitch_stationary.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="joint3" type="revolute">
+    <limit effort="123.6" lower="-1.9809470277777779" upper="1.9809470277777779" velocity="0.2792524444444444"/>
+    <parent link="arm_elbow_pitch_stationary_link"/>
+    <child link="arm_elbow_pitch_revolving_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.098"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+  
+  <link name="arm_elbow_pitch_revolving_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/elbow_pitch_revolving.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/elbow_pitch_revolving.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="arm_elbow_to_elbow_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.0915"/>
+    <parent link="arm_elbow_pitch_revolving_link"/>
+    <child link="arm_elbow_roll_stationary_link"/>
+  </joint>
+
+  <link name="arm_elbow_roll_stationary_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/elbow_roll_stationary.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/elbow_roll_stationary.stl"/>
+      </geometry>
+    </collision>
+  </link>
+    
+  <joint name="joint4" type="revolute">
+    <limit effort="123.6" lower="-2.286379388888889" upper=".5953752222222226" velocity="0.2967057222222222"/>
+    <parent link="arm_elbow_roll_stationary_link"/>
+    <child link="arm_elbow_roll_revolving_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.087063"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="arm_elbow_roll_revolving_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/elbow_roll_revolving.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/elbow_roll_revolving.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="arm_elbow_to_wrist_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.138212"/>
+    <parent link="arm_elbow_roll_revolving_link"/>
+    <child link="arm_wrist_pitch_stationary_link"/>
+  </joint>
+
+  <link name="arm_wrist_pitch_stationary_link">
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/wrist_pitch_stationary.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/wrist_pitch_stationary.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="joint5" type="revolute">
+    <limit effort="48.4" lower="-1.9198605555555557" upper=".9198605555555557" velocity="0.6981311111111111"/>
+    <parent link="arm_wrist_pitch_stationary_link"/>
+    <child link="arm_wrist_pitch_revolving_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.098"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <link name="arm_wrist_pitch_revolving_link">
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/wrist_pitch_revolving.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/wrist_pitch_revolving.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="arm_wrist_to_wrist_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.0915"/>
+    <parent link="arm_wrist_pitch_revolving_link"/>
+    <child link="arm_wrist_roll_stationary_link"/>
+  </joint>
+
+  <link name="arm_wrist_roll_stationary_link">
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/wrist_roll_stationary.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/wrist_roll_stationary.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="joint6" type="revolute">
+    <limit effort="48.4" lower="-2.452185527777778" upper=".4993821944444443" velocity="0.6981311111111111"/>
+    <parent link="arm_wrist_roll_stationary_link"/>
+    <child link="arm_wrist_roll_revolving_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.082992"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  
+  <link name="arm_wrist_roll_revolving_link">
+    <visual>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/wrist_roll_revolving.stl"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://brash_application_tools/meshes/tracarm/wrist_roll_revolving.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+</robot>

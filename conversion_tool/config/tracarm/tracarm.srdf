@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+
+<robot name="tracarm">
+
+    <group name="arm">
+        <chain base_link="tracarm/arm_base_roll_stationary_link" tip_link="tracarm/arm_wrist_roll_revolving_link" />
+    </group>
+
+    <group_state name="Zero" group="arm">
+        <joint name="tracarm/arm_base_roll_joint" value="0" />
+        <joint name="tracarm/arm_elbow_pitch_joint" value="0" />
+        <joint name="tracarm/arm_elbow_roll_joint" value="0" />
+        <joint name="tracarm/arm_shoulder_pitch_joint" value="0" />
+        <joint name="tracarm/arm_shoulder_roll_joint" value="0" />
+        <joint name="tracarm/arm_wrist_pitch_joint" value="0" />
+        <joint name="tracarm/arm_wrist_roll_joint" value="0" />
+    </group_state>
+    
+    <group_state name="Forward Ready Pose" group="arm">
+        <joint name="tracarm/arm_base_roll_joint" value="0" />
+        <joint name="tracarm/arm_elbow_pitch_joint" value="0.7" />
+        <joint name="tracarm/arm_elbow_roll_joint" value="0" />
+        <joint name="tracarm/arm_shoulder_pitch_joint" value="0.7" />
+        <joint name="tracarm/arm_shoulder_roll_joint" value="0" />
+        <joint name="tracarm/arm_wrist_pitch_joint" value="1.7" />
+        <joint name="tracarm/arm_wrist_roll_joint" value="0" />
+    </group_state>
+
+    <group_state name="Backward Ready Pose" group="arm">
+        <joint name="tracarm/arm_base_roll_joint" value="0" />
+        <joint name="tracarm/arm_elbow_pitch_joint" value="-0.7" />
+        <joint name="tracarm/arm_elbow_roll_joint" value="0" />
+        <joint name="tracarm/arm_shoulder_pitch_joint" value="-0.7" />
+        <joint name="tracarm/arm_shoulder_roll_joint" value="0" />
+        <joint name="tracarm/arm_wrist_pitch_joint" value="-1.7" />
+        <joint name="tracarm/arm_wrist_roll_joint" value="0" />
+    </group_state>
+
+</robot>
