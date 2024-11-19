@@ -37,7 +37,7 @@ def generate_launch_description():
 
   ld = LaunchDescription(ARGUMENTS)
   ld.add_action(conversion_node)
-  #ld.add_action(test_publish_node)
+  ld.add_action(test_publish_node)
   return ld
   
 
