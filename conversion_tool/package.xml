@@ -12,19 +12,10 @@
 
   <depend>rclpy</depend>
   <depend>rcl_interfaces</depend>
-  <depend>edoras_msgs</depend>
-  
-  <!-- For panels -->
+  <depend>edoras_msgs</depend>  
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
   <depend>rclcpp</depend>
-  <depend>rviz_common</depend>
-  <depend>rviz_rendering</depend>
-  
-  <build_depend>qtbase5-dev</build_depend>
-
-  <exec_depend>libqt5-core</exec_depend>
-  <exec_depend>libqt5-gui</exec_depend>
-  <exec_depend>libqt5-widgets</exec_depend>
-
 
 
   <test_depend>ament_copyright</test_depend>

@@ -1,0 +1,16 @@
+test_conversion_tool:
+  ros__parameters:
+    command: ['twist_cmd', 'edoras_set_mode_cmd']
+    telemetry: ['joint_states_tlm']
+
+    twist_cmd:
+      type: "geometry_msgs/msg/Twist"
+      topic: "twist_command"
+
+    edoras_set_mode_cmd:
+      type: "std_msgs/msg/String"
+      topic: "edoras_set_mode_command"
+
+    joint_states_tlm:
+      type: "sensor_msgs/msg/JointState"
+      topic: "joint_state_telemetry"
