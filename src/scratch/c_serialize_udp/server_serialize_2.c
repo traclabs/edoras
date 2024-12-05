@@ -69,7 +69,7 @@ int main() {
     n = recvfrom(sockfd, (unsigned char*) buffer, MAXLINE, MSG_DONTWAIT, (struct sockaddr*)NULL, NULL);
     if(n > 0)
     {
-      struct Data* data2  = deserialize(buffer, n);
+      struct Data* data2  = deserialize(buffer, n, 0);
       printf("\t Data 2: Received message with bytes: %d . Age: %d . First name: %s . Last name: %s \n", n, data2->age, data2->first_name, data2->last_name);
     }
     

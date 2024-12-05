@@ -17,7 +17,7 @@ int main()
    unsigned char* buf     = 0;
    size_t         bufSize = serialize(&data1, &buf);
 
-   struct Data*   data2   = deserialize(buf, bufSize);
+   struct Data*   data2   = deserialize(buf, bufSize, 0);
 
    // Verify serialization/deserialization worked as expected.
    assert(data2 != 0);

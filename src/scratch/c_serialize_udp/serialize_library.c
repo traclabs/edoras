@@ -38,7 +38,7 @@ size_t serialize(const struct Data* data, unsigned char** buf)
 /**
  * @function deserialize
  */
-struct Data* deserialize(const unsigned char* buf, const size_t bufSize)
+struct Data* deserialize(const unsigned char* buf, const size_t bufSize, size_t start_offset)
 {  
    static const size_t MIN_BUF_SIZE = 12;  // min size of buffer includes age, zero-length first/last names
 
@@ -51,7 +51,7 @@ struct Data* deserialize(const unsigned char* buf, const size_t bufSize)
       {
          unsigned int tmp_i = 0;
          size_t tmp = 0;
-         size_t offset = 0;
+         size_t offset = 0 + start_offset;
 
          // get the age
           memcpy(&tmp_i, buf + offset, sizeof(tmp_i));

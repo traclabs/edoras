@@ -14,3 +14,6 @@ target_link_libraries(server_serialize_1 serialize_library)
 
 add_executable(server_serialize_2 server_serialize_2.c)
 target_link_libraries(server_serialize_2 serialize_library)
+
+add_executable(header_serialize_test header_serialize_test.c)
+target_link_libraries(header_serialize_test serialize_library)
