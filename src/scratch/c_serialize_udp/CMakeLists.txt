@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.16)
+project(c_serialize_udp)
+
+set(CMAKE_C_STANDARD 99)
+
+add_library(serialize_library serialize_library.c)
+
+
+add_executable(serialize_test serialize_test.c)
+target_link_libraries(serialize_test serialize_library)
+
+add_executable(server_serialize_1 server_serialize_1.c)
+target_link_libraries(server_serialize_1 serialize_library)
+
+add_executable(server_serialize_2 server_serialize_2.c)
+target_link_libraries(server_serialize_2 serialize_library)
