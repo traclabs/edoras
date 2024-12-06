@@ -24,9 +24,9 @@ size_t serializeWithCommandHeader(const struct Data* data, unsigned char** buf_w
    // 1: code
    // 1: checksum
    unsigned short seq;
-   unsigned short length = (unsigned short)(bufSize + headerSize) - 7;
+   unsigned short length = (bufSize + headerSize) - 7;
    unsigned char  header[8];
-   printf("Serializing data. Length: %d \n", length);
+   printf("Serializing data. Length - 7: %d \n", length);
 
    header[0] = 0x18;
    header[1] = 0x27;
@@ -50,7 +50,7 @@ size_t serializeWithCommandHeader(const struct Data* data, unsigned char** buf_w
    memcpy(*buf_with_header + offset, buf, bufSize);
    
    
-   return length;
+   return (bufSize + headerSize);
 } 
 
 ///////////////
@@ -111,8 +111,8 @@ int main()
    struct Data data1;
 
    data1.age        = 23;
-   data1.first_name = strdup("Neil");
-   data1.last_name  = strdup("Armstrong");
+   data1.first_name = strdup("Neil Alden");
+   data1.last_name  = strdup("Bellisima Hermosa Madison"); // 35
 
 
    unsigned char* buf_with_header = 0;
