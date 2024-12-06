@@ -14,7 +14,10 @@ class TestPublisher : public rclcpp::Node
    TestPublisher() : Node("test_publisher")
    {
 
-
+    std_msgs::msg::Header hdr;
+        RCLCPP_INFO(this->get_logger(), "Size of time: %d \n", sizeof(hdr.stamp));
+            RCLCPP_INFO(this->get_logger(), "Size of frame id: %d \n", sizeof(hdr.frame_id));
+    RCLCPP_INFO(this->get_logger(), "Size of header: %d \n", sizeof(hdr));
     publisher_twist_ = this->create_publisher<geometry_msgs::msg::Twist>("twist_command", 10);
     publisher_string_ = this->create_publisher<std_msgs::msg::String>("edoras_set_mode_command", 10);
     subscriber_js_ = this->create_subscription<sensor_msgs::msg::JointState>("joint_state_telemetry", 10, std::bind(&TestPublisher::sub_cb, this, std::placeholders::_1));

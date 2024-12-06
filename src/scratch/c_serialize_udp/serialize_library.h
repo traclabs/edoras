@@ -6,7 +6,7 @@
 
 struct Data
 {
-   unsigned int age;
+   unsigned int age; // 4 bytes
    char*        first_name;
    char*        last_name;
 };

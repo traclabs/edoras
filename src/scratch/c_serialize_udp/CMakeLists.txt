@@ -17,3 +17,6 @@ target_link_libraries(server_serialize_2 serialize_library)
 
 add_executable(header_serialize_test header_serialize_test.c)
 target_link_libraries(header_serialize_test serialize_library)
+
+add_executable(send_command_message_to_edoras_app send_command_message_to_edoras_app.c)
+target_link_libraries(send_command_message_to_edoras_app serialize_library)
