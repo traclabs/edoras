@@ -222,6 +222,7 @@ rcutils_allocator_t * allocator;
     uint8_t * member_data = &data[member_info.offset_];
     // Recursively (because some members may be non-primitive types themselves) convert the member
     //yaml_msg[member_info.name_] = dynmsg::c::impl::member_to_yaml(member_info, member_data);
+    member_to_yaml(member_info, member_data);
     RCLCPP_INFO(this->get_logger(), "Member[%lu] offset: %d -- Member info name: %s \n", ii, member_info.offset_, member_info.name_);
   } 
    
@@ -240,7 +241,18 @@ rcutils_allocator_t * allocator;
   //bc_.sendCmdPacket(mid, code, seq, &data_buffer, data_size);
 }
 
+void member_to_yaml(
+  const rosidl_typesupport_introspection_c__MessageMember & member_info,
+  uint8_t * member_data)
+  if (member_info.is_array_) {
+    //YAML::Node array;
+    if (member_info.is_upper_bound_ || member_info.array_size_ == 0) {
+      dynamic_array_to_yaml(member_info, member_data, array);
+    //} else {
+    //  fixed_array_to_yaml(member_info, member_data, array);
+    //}
 
+  }
 
 /**
  * @function addSubscriber
