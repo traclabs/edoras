@@ -34,7 +34,7 @@ class TestPublisher : public rclcpp::Node
         //RCLCPP_INFO(this->get_logger(), "Publishing message Pose");
         this->publisher_pose_->publish(message);
 
-        auto msg2 = sensor_msgs::msg::JointState();
+        /*auto msg2 = sensor_msgs::msg::JointState();
         if(count_ % 2 == 0) 
         {
           msg2.name = {"j1", "j2", "j3", "j4", "j5"};
@@ -47,7 +47,7 @@ class TestPublisher : public rclcpp::Node
         }  
         //RCLCPP_INFO(this->get_logger(), "Publishing message Joint State");
         this->publisher_js_->publish(msg2);
-
+*/
 
         count_++;
       };

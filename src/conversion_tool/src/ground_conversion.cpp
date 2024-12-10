@@ -52,6 +52,58 @@ bool GroundConversion::parseComm()
 }
 
 /**
+ * @file loadCommandInfo
+ */
+bool GroundConversion::loadCommandInfo( const std::vector<std::string> &_cmd_vals)
+{  
+  for(auto cmd_key : _cmd_vals)
+  {
+     std::map<std::string, rclcpp::Parameter> cmd_params;
+     CmdInfo_t ci;
+
+     if (this->get_parameters(cmd_key, cmd_params))
+     { 
+      if(cmd_params.find("type") == cmd_params.end())
+        continue;
+      if(cmd_params.find("topic") == cmd_params.end())
+        continue;
+      if(cmd_params.find("mid") == cmd_params.end())
+        continue;
+
+      ci.msg_type = cmd_params["type"].as_string();
+      ci.topic = cmd_params["topic"].as_string();
+      ci.mid = cmd_params["mid"].as_int() & 0xFFFF;
+      if(!extract_type_identifier(ci.msg_type, ci.interface_name, ci.interface_type))
+      {
+       RCLCPP_ERROR(this->get_logger(), "Error getting interface type and name");
+      }
+      
+      // Load library
+      ci.library = rclcpp::get_typesupport_library(
+                   ci.interface_name + "/" + ci.interface_type, 
+                   "rosidl_typesupport_c");
+      ci.type_support = rclcpp::get_message_typesupport_handle(
+                        ci.interface_name + "/" + ci.interface_type, 
+                        "rosidl_typesupport_c", *ci.library);
+      std::string error_msg;
+      ci.type_info = get_type_info(ci.interface_name, 
+                     ci.interface_type,
+                     error_msg);
+                          
+      cmd_info_[ci.topic] = ci;
+      
+      RCLCPP_INFO(this->get_logger(), "*** CMD: Got type: %s, interface name: %s, interface type: %s topic: %s and mid: %02x, %02x", ci.msg_type.c_str(), ci.interface_name.c_str(), ci.interface_type.c_str(), ci.topic.c_str(), (ci.mid >> 8) & 0xFF, ci.mid & 0xFF );
+
+      // Add subscriber
+      this->addSubscriber( ci.topic, ci.msg_type );
+     }
+     
+  } // for cmd 
+
+  return true;
+}
+
+/**
  * @function parseConfigParams
  * @brief Read command and telemetry data
  */
@@ -74,38 +126,7 @@ bool GroundConversion::parseConfigParams()
   }  
 
   cmd_vals = cmd_param.as_string_array();
-  
-  for(auto cmd_key : cmd_vals)
-  {
-     std::map<std::string, rclcpp::Parameter> cmd_params;
-     CmdInfo_t ci;
-
-     if (this->get_parameters(cmd_key, cmd_params))
-     { 
-      if(cmd_params.find("type") == cmd_params.end())
-        continue;
-      if(cmd_params.find("topic") == cmd_params.end())
-        continue;
-      if(cmd_params.find("mid") == cmd_params.end())
-        continue;
-
-      ci.msg_type = cmd_params["type"].as_string();
-      ci.topic = cmd_params["topic"].as_string();
-      ci.mid = cmd_params["mid"].as_int() & 0xFFFF;
-      if(!extract_type_identifier(ci.msg_type, ci.interface_name, ci.interface_type))
-      {
-       RCLCPP_ERROR(this->get_logger(), "Error getting interface type and name");
-      }
-      
-      cmd_info_[ci.topic] = ci;
-      
-      RCLCPP_INFO(this->get_logger(), "*** CMD: Got type: %s, interface name: %s, interface type: %s topic: %s and mid: %02x, %02x", ci.msg_type.c_str(), ci.interface_name.c_str(), ci.interface_type.c_str(), ci.topic.c_str(), (ci.mid >> 8) & 0xFF, ci.mid & 0xFF );
-
-      // Add subscriber
-      this->addSubscriber( ci.topic, ci.msg_type );
-     }
-     
-  } // for cmd 
+  loadCommandInfo(cmd_vals);
 
   // Tlm
   rclcpp::Parameter tlm_param;
@@ -159,100 +180,33 @@ bool GroundConversion::initCommunication()
  */
 void GroundConversion::subscriberCallback(const std::shared_ptr<const rclcpp::SerializedMessage> _msg, const std::string &_topic_name)
 {
-   if( cmd_info_.find(_topic_name) == cmd_info_.end() )
+  if( cmd_info_.find(_topic_name) == cmd_info_.end() )
   {
      RCLCPP_ERROR(this->get_logger(), "Cmd Info has not topic name stored, not trying to serialize");
      return;
   }
-  
-  std::string interface_name = cmd_info_[_topic_name].interface_name;
-  std::string interface_type = cmd_info_[_topic_name].interface_type;
-  
-  RCLCPP_INFO( this->get_logger(), " Message type for topic: %s - Interface name: %s , type: %s", 
-               _topic_name.c_str(), interface_name.c_str(), interface_type.c_str()); 
-  
 
-  auto library = rclcpp::get_typesupport_library(
-      interface_name + "/" + interface_type, "rosidl_typesupport_c");
-  auto type_support = rclcpp::get_message_typesupport_handle(
-      interface_name + "/" + interface_type, "rosidl_typesupport_c", *library);
-    
-  //uint8_t* data; // = reinterpret_cast<uint8_t *>(&ros_msg);
-
-  RCLCPP_INFO(this->get_logger(), "Get type info");
+  // Deserialize from SerializedMessage to TypeSupport
+  uint8_t* data_buffer;
+  size_t  buffer_size;
   std::string error_msg;
-  const rosidl_typesupport_introspection_c__MessageMembers * type_info =  
-  get_type_info(interface_name, 
-                interface_type,
-                error_msg);
+  RCLCPP_INFO(this->get_logger(), "Start from serialized to byte array");
+  data_buffer = from_serialized_to_byte_array( &(_msg.get()->get_rcl_serialized_message()), 
+                cmd_info_[_topic_name].library, 
+                cmd_info_[_topic_name].type_support, 
+                cmd_info_[_topic_name].type_info, 
+                buffer_size, error_msg );
 
-
-/////////////////////////////////////////////////////////
-rcutils_allocator_t * allocator;
-  rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
-  RCLCPP_INFO(this->get_logger(), "Allocating message buffer of size %ld bytes",
-    type_info->size_of_);
-    allocator = &default_allocator;
-  // Allocate space to store the binary representation of the message
-  uint8_t * data =
-    static_cast<uint8_t *>(allocator->allocate(type_info->size_of_, allocator->state));
-  if (nullptr == data) {
-    RCLCPP_ERROR(this->get_logger(), "Error allocating");
-    return;
-  }
-  // Initialise the message buffer according to the interface type
-  type_info->init_function(data, ROSIDL_RUNTIME_C_MSG_INIT_ALL);
-  //////////////////////////////////////////////////
-
-
-  RCLCPP_INFO(this->get_logger(), "Rmw deserialize....");  
-  auto ret = rmw_deserialize(&(_msg.get()->get_rcl_serialized_message()), type_support, data);
-  
-  
-    if (ret != RMW_RET_OK) {
-      RCLCPP_ERROR(this->get_logger(), "Failed to deserialize ROS message in C, it seems");
-      return;
-    }
-
-     RCLCPP_INFO(this->get_logger(), "Beginning of for...");
-  for (uint32_t ii = 0; ii < type_info->member_count_; ++ii) {
-    // Get the introspection information for this particular member
-    const rosidl_typesupport_introspection_c__MessageMember & member_info = type_info->members_[ii];
-    // Get a pointer to the member's data in the binary buffer
-    uint8_t * member_data = &data[member_info.offset_];
-    // Recursively (because some members may be non-primitive types themselves) convert the member
-    //yaml_msg[member_info.name_] = dynmsg::c::impl::member_to_yaml(member_info, member_data);
-    member_to_yaml(member_info, member_data);
-    RCLCPP_INFO(this->get_logger(), "Member[%lu] offset: %d -- Member info name: %s \n", ii, member_info.offset_, member_info.name_);
-  } 
+  debug_read_message(data_buffer, cmd_info_[_topic_name].type_info);
    
-   
-  // Serialize the data
-  unsigned char* data_buffer = 0;
-  size_t  data_size; // = serialize(data, &buf);
-  
-  uint16_t mid;
+  uint16_t mid = cmd_info_[_topic_name].mid;
   uint8_t code = 0x01;
   uint16_t seq = 0;
   
-  // Hard-code to test
-  //if(
-  
-  //bc_.sendCmdPacket(mid, code, seq, &data_buffer, data_size);
+  // Send data to cFS
+  bc_.sendCmdPacket(mid, code, seq, &data_buffer, buffer_size);  
 }
 
-void member_to_yaml(
-  const rosidl_typesupport_introspection_c__MessageMember & member_info,
-  uint8_t * member_data)
-  if (member_info.is_array_) {
-    //YAML::Node array;
-    if (member_info.is_upper_bound_ || member_info.array_size_ == 0) {
-      dynamic_array_to_yaml(member_info, member_data, array);
-    //} else {
-    //  fixed_array_to_yaml(member_info, member_data, array);
-    //}
-
-  }
 
 /**
  * @function addSubscriber

@@ -25,7 +25,7 @@ bool BasicCommunication::initialize( const int &_own_port,
     sock_fd_ = socket(AF_INET, SOCK_DGRAM, 0);
     if(sock_fd_ < 0)
     {
-       _error_msg = "Socket creationg failed";
+       _error_msg = "Socket creation failed";
        return false;
     }
   
