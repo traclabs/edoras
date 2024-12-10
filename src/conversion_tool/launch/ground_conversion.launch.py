@@ -22,8 +22,8 @@ def generate_launch_description():
   config = os.path.join(get_package_share_directory('conversion_tool'), 'config', 'conversion_bridge.yaml')
   conversion_node = Node(
           package='conversion_tool',
-          executable='test_conversion_tool',
-          name='test_conversion_tool',
+          executable='ground_conversion_node',
+          name='ground_conversion_node',
           output='screen',
           parameters=[config]
           ) 

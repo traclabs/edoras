@@ -27,15 +27,19 @@ find_package(std_msgs REQUIRED)
 
 include_directories(include)
 
-set(SRC_FILES
-  src/ground_conversion.cpp
-)
+# basic_communication -------------
+add_library(basic_communication src/basic_communication.cpp)
 
-add_library(ground_conversion SHARED ${SRC_FILES})
+# ground_conversion -------------
+add_library(ground_conversion SHARED 
+            src/ground_conversion.cpp
+            src/parser_utils.cpp)
 ament_target_dependencies(ground_conversion
   rclcpp
   ${dependencies}
 )
+target_link_libraries(ground_conversion basic_communication)
+
 
 add_executable(test_publisher tools/test_publisher.cpp)
 ament_target_dependencies(test_publisher
@@ -43,12 +47,12 @@ ament_target_dependencies(test_publisher
   ${dependencies}
 )
 
-add_executable(test_conversion_tool tools/test_conversion_tool.cpp)
-ament_target_dependencies(test_conversion_tool
+add_executable(ground_conversion_node src/ground_conversion_node.cpp)
+ament_target_dependencies(ground_conversion_node
   rclcpp
   ${dependencies}
 )
-target_link_libraries(test_conversion_tool ground_conversion)
+target_link_libraries(ground_conversion_node ground_conversion)
 
 ament_export_dependencies(
   rclcpp
@@ -58,9 +62,10 @@ ament_export_dependencies(
 
 
 install(TARGETS
+  basic_communication
   ground_conversion 
   test_publisher
-  test_conversion_tool
+  ground_conversion_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
