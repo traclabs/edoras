@@ -3,8 +3,7 @@
  */
 #include <conversion_tool/ground_conversion.h>
 #include <conversion_tool/parser_utils.h>
-// TEMPORAL:
-#include <geometry_msgs/msg/pose.h>
+#include <conversion_tool/debug_utils.h>
 
 #include <dlfcn.h>
 
@@ -197,7 +196,7 @@ void GroundConversion::subscriberCallback(const std::shared_ptr<const rclcpp::Se
                 cmd_info_[_topic_name].type_info, 
                 buffer_size, error_msg );
 
-  debug_read_message(data_buffer, cmd_info_[_topic_name].type_info);
+  debug_parse_message(data_buffer, cmd_info_[_topic_name].type_info);
    
   uint16_t mid = cmd_info_[_topic_name].mid;
   uint8_t code = 0x01;

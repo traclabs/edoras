@@ -33,7 +33,8 @@ add_library(basic_communication src/basic_communication.cpp)
 # ground_conversion -------------
 add_library(ground_conversion SHARED 
             src/ground_conversion.cpp
-            src/parser_utils.cpp)
+            src/parser_utils.cpp
+            src/debug_utils.cpp)
 ament_target_dependencies(ground_conversion
   rclcpp
   ${dependencies}
