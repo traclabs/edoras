@@ -63,33 +63,21 @@ bool BasicCommunication::sendCmdPacket(const uint16_t &_mid, const uint8_t &_cod
 {   
     //size_t         bufSize = serialize(_js, &buf);
 
-    unsigned char* cmd_packet = 0;
+    unsigned char* cmd_packet = new unsigned char[_data_size + 8];
     size_t cmd_packet_size;
     cmd_packet_size = createCmdPacket(_mid, _code, _seq, _data_size, _data_buffer, &cmd_packet);
     
+    //  Read data from cmd packet
+    /*size_t buffer_length, buffer_capacity;
+    memcpy(&buffer_length, cmd_packet + 8, sizeof(size_t));
+    memcpy(&buffer_capacity, cmd_packet + 8 + sizeof(size_t), sizeof(size_t));
+    printf("BEFORE SENDING THROUGH NETWORK VERIFY: Packet length: %d BUFFER LENGTH: %ld -- buffer capacity: %ld !!! \n", cmd_packet_size, buffer_length, buffer_capacity);*/ // DEBUG
     int res = sendto(sock_fd_, cmd_packet, cmd_packet_size, 0, (const struct sockaddr *)&fsw_address_, sizeof(fsw_address_));
     
     if(res < 0)
       return false;
 
     return true;
-}
-  
-/**
- * @function receiveTlmPacket
- */  
-bool BasicCommunication::receiveTlmPacket()
-{/*
-     int n; 
-     // Receive............
-    n = recvfrom(sockfd, (unsigned char*) buffer, MAXLINE, MSG_DONTWAIT, (struct sockaddr*)NULL, NULL);
-    if(n > 0)
-    {
-      struct Data* data2  = deserialize(buffer, n, 0);
-      printf("\t Data 2: Received message with bytes: %d . Age: %d . First name: %s . Last name: %s \n", n, data2->age, data2->first_name, data2->last_name);
-    }
-*/
-  return true;  
 }
 
 /**
@@ -128,14 +116,33 @@ size_t BasicCommunication::createCmdPacket(const uint16_t &_mid, const uint8_t &
 
 
    // Add header bytes on top of the serialized data
-   *_cmd_packet = (unsigned char*) calloc(1, packet_length);
+   //*_cmd_packet = (unsigned char*) calloc(1, packet_length);
    size_t offset = 0;
   
    memcpy(*_cmd_packet + offset, &cmd_header, sizeof(cmd_header));  offset += sizeof(cmd_header);
-   memcpy(*_cmd_packet + offset, _data_buffer, _data_size);
+   memcpy(*_cmd_packet + offset, *_data_buffer, _data_size);
    
   return packet_length;
 }
+
+  
+/**
+ * @function receiveTlmPacket
+ */  
+bool BasicCommunication::receiveTlmPacket()
+{/*
+     int n; 
+     // Receive............
+    n = recvfrom(sockfd, (unsigned char*) buffer, MAXLINE, MSG_DONTWAIT, (struct sockaddr*)NULL, NULL);
+    if(n > 0)
+    {
+      struct Data* data2  = deserialize(buffer, n, 0);
+      printf("\t Data 2: Received message with bytes: %d . Age: %d . First name: %s . Last name: %s \n", n, data2->age, data2->first_name, data2->last_name);
+    }
+*/
+  return true;  
+}
+
 
 
 

@@ -47,7 +47,7 @@ class TestPublisher : public rclcpp::Node
           msg2.position = {0.42, 0.51, 0.68};        
         }  
         //RCLCPP_INFO(this->get_logger(), "Publishing message Joint State");
-        this->publisher_js_->publish(msg2);
+        //this->publisher_js_->publish(msg2);
 
 
         count_++;

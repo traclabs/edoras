@@ -13,11 +13,13 @@
  * @brief Converts from a SerializedMessage data to data formated in a C message structure
  */
 uint8_t* from_serialized_to_byte_array(const rcl_serialized_message_t* _serialized_msg,
-                                       std::shared_ptr<rcpputils::SharedLibrary> _library, 
                                        const TypeSupport_t* _type_support,
                                        const TypeInfo_t* _type_info,
                                        size_t &_buffer_size, 
                                        std::string &_error_msg);
+
+uint8_t* from_rcutils_uint_array_to_uint_buffer(const rcl_serialized_message_t* _serialized_msg, 
+                                                size_t &_buffer_size, size_t &_msg_length, size_t&_msg_capacity);
 
 
 const TypeInfo_t * get_type_info(const std::string  &_interface_name, 

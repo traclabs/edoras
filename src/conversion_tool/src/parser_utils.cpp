@@ -6,7 +6,6 @@
 #include <dlfcn.h>
 
 uint8_t* from_serialized_to_byte_array(const rcl_serialized_message_t* _serialized_msg,
-                                       std::shared_ptr<rcpputils::SharedLibrary> _library, 
                                        const TypeSupport_t* _type_support,
                                        const TypeInfo_t* _type_info,
                                        size_t &_buffer_size, 
@@ -43,6 +42,46 @@ uint8_t* from_serialized_to_byte_array(const rcl_serialized_message_t* _serializ
   }
     
   return data;
+}
+
+/**
+ * @function from_rcutils_uint_array_to_uint_buffer 
+ * @brief
+ * @output An array of bytes. It contains:
+ * size_t (2 bytes): buffer length
+ * size_t (2 bytes): buffer capacity
+ * rest of bytes: Serialized data in format used by ROS2 by default (in this case, CDR, from fastrtps)
+ * _buffer_size : Parameter that contains the size of the output buffer (4 + size_of (rest of bytes) )
+ */
+uint8_t* from_rcutils_uint_array_to_uint_buffer(const rcl_serialized_message_t* _serialized_msg, 
+                                                size_t &_buffer_size, size_t &_msg_length, size_t&_msg_capacity)
+{
+   size_t msg_buffer_length = _serialized_msg->buffer_length;
+   size_t msg_buffer_capacity = _serialized_msg->buffer_capacity;
+
+
+   // Set the buffer_size
+   _buffer_size = sizeof(size_t) + sizeof(size_t) + msg_buffer_length;
+   
+   // Get space for size_t + size_t + msg_buffer
+   uint8_t* buffer = new uint8_t[_buffer_size]; 
+   
+   
+   // Fill the space
+   uint8_t offset = 0;
+   std::memcpy(buffer + offset, &msg_buffer_length, sizeof(size_t));  
+   offset += sizeof(msg_buffer_length);
+   std::memcpy(buffer + offset, &msg_buffer_capacity, sizeof(size_t));
+   offset += sizeof(msg_buffer_capacity);
+   std::memcpy(buffer + offset, _serialized_msg->buffer, msg_buffer_length);
+
+   // Return
+   
+   // DEBUG
+   _msg_length = msg_buffer_length;
+   _msg_capacity = msg_buffer_capacity;
+   
+   return buffer;
 }
 
 

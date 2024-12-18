@@ -187,23 +187,29 @@ void GroundConversion::subscriberCallback(const std::shared_ptr<const rclcpp::Se
 
   // Deserialize from SerializedMessage to TypeSupport
   uint8_t* data_buffer;
-  size_t  buffer_size;
+  size_t  data_buffer_size;
   std::string error_msg;
   RCLCPP_INFO(this->get_logger(), "Start from serialized to byte array");
-  data_buffer = from_serialized_to_byte_array( &(_msg.get()->get_rcl_serialized_message()), 
+  
+  size_t test_length, test_capacity;
+  data_buffer = from_rcutils_uint_array_to_uint_buffer(&(_msg.get()->get_rcl_serialized_message()), data_buffer_size, test_length, test_capacity);
+  
+  // for debugging
+  /*data_buffer = from_serialized_to_byte_array( &(_msg.get()->get_rcl_serialized_message()), 
                 cmd_info_[_topic_name].library, 
                 cmd_info_[_topic_name].type_support, 
                 cmd_info_[_topic_name].type_info, 
-                buffer_size, error_msg );
+                buffer_size, error_msg );*/
 
-  debug_parse_message(data_buffer, cmd_info_[_topic_name].type_info);
+  //debug_parse_message(data_buffer, cmd_info_[_topic_name].type_info);
    
   uint16_t mid = cmd_info_[_topic_name].mid;
   uint8_t code = 0x01;
   uint16_t seq = 0;
   
   // Send data to cFS
-  bc_.sendCmdPacket(mid, code, seq, &data_buffer, buffer_size);  
+  RCLCPP_INFO(this->get_logger(), "Send cmd packet, mid: %02x . Buffer size: %lu", mid, data_buffer_size);
+  bc_.sendCmdPacket(mid, code, seq, &data_buffer, data_buffer_size);  
 }
 
 
