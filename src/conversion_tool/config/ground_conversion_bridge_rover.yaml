@@ -15,12 +15,6 @@ ground_conversion_node:
       topic: "command_twist"
       mid: 0x1827 # GATEWAY_APP_CMD_MID 
 
-#    js_cmd:
-#      type: "sensor_msgs/msg/JointState"
-#      topic: "js_command"
-#      mid: 0x1827 # GATEWAY_APP_CMD_MID 
-
-      
     tlm_pose:
       type: "geometry_msgs/msg/Pose"
       topic: "telemetry_pose"

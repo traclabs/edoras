@@ -1,0 +1,27 @@
+flight_conversion_node:
+
+  ros__parameters:
+  
+    communication:
+      bridge_port: 1235
+      fsw_port: 1234	
+      fsw_ip: "127.0.0.1"
+  
+    command: ['pose_cmd']
+    telemetry: ['joint_states_tlm']
+
+    pose_cmd:
+      type: "geometry_msgs/msg/Pose"
+      topic: "pose_command"
+      mid: 0x1827 # GATEWAY_APP_CMD_MID 
+
+    js_cmd:
+      type: "sensor_msgs/msg/JointState"
+      topic: "js_command"
+      mid: 0x1827 # GATEWAY_APP_CMD_MID 
+
+      
+    joint_states_tlm:
+      type: "sensor_msgs/msg/JointState"
+      topic: "joint_state_telemetry"
+      mid: 0x827

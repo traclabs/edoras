@@ -176,6 +176,7 @@ bool GroundConversion::initCommunication()
 
 /**
  * @function subscriberCallback
+ * @brief Subscribes to ROS topic corresponding to a command to be sent to cFS
  */
 void GroundConversion::subscriberCallback(const std::shared_ptr<const rclcpp::SerializedMessage> _msg, const std::string &_topic_name)
 {
@@ -189,17 +190,10 @@ void GroundConversion::subscriberCallback(const std::shared_ptr<const rclcpp::Se
   uint8_t* data_buffer;
   size_t  data_buffer_size;
   std::string error_msg;
-  RCLCPP_INFO(this->get_logger(), "Start from serialized to byte array");
   
   size_t test_length, test_capacity;
+
   data_buffer = from_rcutils_uint_array_to_uint_buffer(&(_msg.get()->get_rcl_serialized_message()), data_buffer_size, test_length, test_capacity);
-  
-  // for debugging
-  /*data_buffer = from_serialized_to_byte_array( &(_msg.get()->get_rcl_serialized_message()), 
-                cmd_info_[_topic_name].library, 
-                cmd_info_[_topic_name].type_support, 
-                cmd_info_[_topic_name].type_info, 
-                buffer_size, error_msg );*/
 
   //debug_parse_message(data_buffer, cmd_info_[_topic_name].type_info);
    

@@ -41,12 +41,19 @@ ament_target_dependencies(ground_conversion
 )
 target_link_libraries(ground_conversion basic_communication)
 
-
+# Tools ***************************************
 add_executable(test_publisher tools/test_publisher.cpp)
 ament_target_dependencies(test_publisher
   rclcpp
   ${dependencies}
 )
+
+add_executable(test_publisher_rover tools/test_publisher_rover.cpp)
+ament_target_dependencies(test_publisher_rover
+  rclcpp
+  ${dependencies}
+)
+# Tools ***************************************
 
 add_executable(ground_conversion_node src/ground_conversion_node.cpp)
 ament_target_dependencies(ground_conversion_node
@@ -66,6 +73,7 @@ install(TARGETS
   basic_communication
   ground_conversion 
   test_publisher
+  test_publisher_rover
   ground_conversion_node
   DESTINATION lib/${PROJECT_NAME}
 )

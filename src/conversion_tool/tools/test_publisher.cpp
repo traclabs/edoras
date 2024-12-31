@@ -20,7 +20,7 @@ class TestPublisher : public rclcpp::Node
             RCLCPP_INFO(this->get_logger(), "Size of frame id: %d \n", sizeof(hdr.frame_id));
     RCLCPP_INFO(this->get_logger(), "Size of header: %d \n", sizeof(hdr));
     publisher_pose_ = this->create_publisher<geometry_msgs::msg::Pose>("pose_command", 10);
-    publisher_js_ = this->create_publisher<sensor_msgs::msg::JointState>("js_command", 10);
+    publisher_js_ = this->create_publisher<sensor_msgs::msg::JointState>("js_command", 10);    
     subscriber_js_ = this->create_subscription<sensor_msgs::msg::JointState>("joint_state_telemetry", 10, std::bind(&TestPublisher::sub_cb, this, std::placeholders::_1));
     
     auto timer_callback = 
@@ -32,7 +32,7 @@ class TestPublisher : public rclcpp::Node
         message.position.z = 12;
         message.orientation.w = 1985;
         //RCLCPP_INFO(this->get_logger(), "Publishing message Pose");
-        this->publisher_pose_->publish(message);
+        //this->publisher_pose_->publish(message);
 
         sleep(1);
         auto msg2 = sensor_msgs::msg::JointState();
@@ -47,7 +47,7 @@ class TestPublisher : public rclcpp::Node
           msg2.position = {0.42, 0.51, 0.68};        
         }  
         //RCLCPP_INFO(this->get_logger(), "Publishing message Joint State");
-        //this->publisher_js_->publish(msg2);
+        this->publisher_js_->publish(msg2);
 
 
         count_++;

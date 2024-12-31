@@ -12,10 +12,8 @@ uint8_t* from_serialized_to_byte_array(const rcl_serialized_message_t* _serializ
                                        std::string &_error_msg)
 {    
   //uint8_t* data; // = reinterpret_cast<uint8_t *>(&ros_msg);
-
   std::string error_msg;
 
- 
   // Allocate space for the pointer to the C data
   rcutils_allocator_t * allocator;
   rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
@@ -44,14 +42,82 @@ uint8_t* from_serialized_to_byte_array(const rcl_serialized_message_t* _serializ
   return data;
 }
 
+uint8_t* from_serialized_to_byte_array_2(const rcl_serialized_message_t* _serialized_msg,
+                                       const TypeSupport_t* _type_support,
+                                       const TypeInfo_t* _type_info,
+                                       size_t &_buffer_size, 
+                                       std::string &_error_msg)
+{
+  // Initialize SerializedMessage
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  size_t buffer_capacity = _serialized_msg->buffer_capacity;
+  size_t buffer_length = _serialized_msg->buffer_length;
+  
+  rcutils_uint8_array_t* serialized_array = new rcutils_uint8_array_t;
+  *serialized_array = rcutils_get_zero_initialized_uint8_array();
+  rcutils_uint8_array_init(serialized_array, buffer_capacity, &allocator);
+ 
+  // Allocate space for the pointer to the C data
+  if( rcutils_uint8_array_resize(serialized_array, buffer_capacity) != RCUTILS_RET_OK)
+  {
+    printf("edoras_core: Error initializing array for deserialization process. RESULT: %d \n");
+  }
+  printf("Buffer length: %d capacity: %d. \n", 
+          serialized_array->buffer_length, 
+          serialized_array->buffer_capacity);
+  
+  memcpy( (uint8_t*)serialized_array->buffer, _serialized_msg->buffer, buffer_length);
+  serialized_array->buffer_length = buffer_length;
+  printf("Buffer length 2: %d capacity: %d \n", serialized_array->buffer_length, serialized_array->buffer_capacity);
+
+  printf("Buffer content in serial: \n");
+  for(size_t i = 0; i < buffer_length; ++i)
+  {
+   uint8_t di;
+   memcpy(&di, (uint8_t*)serialized_array->buffer + i, sizeof(uint8_t));
+   printf("%02x ", di);
+  } printf("\n");
+
+  
+  // Get default buffer size
+  _buffer_size = _type_info->size_of_;
+
+
+  // Initialise the message buffer according to the interface type
+  // Allocate space to store the binary representation of the message
+  printf("Allocating... Size: %ld \n", _buffer_size);
+  
+  rcutils_allocator_t * alloca;
+  rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
+  alloca = &default_allocator;
+  
+  uint8_t* data = static_cast<uint8_t *>(alloca->allocate(_buffer_size, alloca->state));
+  _type_info->init_function(data, ROSIDL_RUNTIME_C_MSG_INIT_ALL);
+
+  if (data == nullptr) {
+    printf("edoras_core: Error allocating space \n");
+    return nullptr;
+  }
+
+  
+  // 3. Deserialize the message into a ROS message C structure
+  printf("Deserializing.... \n");
+  if ( rmw_deserialize( serialized_array, _type_support, data ) != RMW_RET_OK ) {
+    printf("Failed to apply rmw_deserialize \n");
+    return nullptr;
+  }
+  
+  return data;
+}  
+
 /**
  * @function from_rcutils_uint_array_to_uint_buffer 
  * @brief
  * @output An array of bytes. It contains:
- * size_t (2 bytes): buffer length
- * size_t (2 bytes): buffer capacity
+ * size_t (8 bytes): buffer length
+ * size_t (8 bytes): buffer capacity
  * rest of bytes: Serialized data in format used by ROS2 by default (in this case, CDR, from fastrtps)
- * _buffer_size : Parameter that contains the size of the output buffer (4 + size_of (rest of bytes) )
+ * _buffer_size : Parameter that contains the size of the output buffer  = 16 + size_of (rest of bytes)  = 16 + buffer_length
  */
 uint8_t* from_rcutils_uint_array_to_uint_buffer(const rcl_serialized_message_t* _serialized_msg, 
                                                 size_t &_buffer_size, size_t &_msg_length, size_t&_msg_capacity)

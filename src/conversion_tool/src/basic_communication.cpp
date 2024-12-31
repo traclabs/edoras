@@ -62,16 +62,18 @@ bool BasicCommunication::sendCmdPacket(const uint16_t &_mid, const uint8_t &_cod
                                        const size_t &_data_size)
 {   
     //size_t         bufSize = serialize(_js, &buf);
-
-    unsigned char* cmd_packet = new unsigned char[_data_size + 8];
+    size_t header_ccsds_offset = 8;
+    unsigned char* cmd_packet = new unsigned char[_data_size + header_ccsds_offset];
     size_t cmd_packet_size;
     cmd_packet_size = createCmdPacket(_mid, _code, _seq, _data_size, _data_buffer, &cmd_packet);
     
     //  Read data from cmd packet
-    /*size_t buffer_length, buffer_capacity;
-    memcpy(&buffer_length, cmd_packet + 8, sizeof(size_t));
-    memcpy(&buffer_capacity, cmd_packet + 8 + sizeof(size_t), sizeof(size_t));
-    printf("BEFORE SENDING THROUGH NETWORK VERIFY: Packet length: %d BUFFER LENGTH: %ld -- buffer capacity: %ld !!! \n", cmd_packet_size, buffer_length, buffer_capacity);*/ // DEBUG
+    // DEBUG START----
+    size_t buffer_length, buffer_capacity;
+    memcpy(&buffer_length, cmd_packet + header_ccsds_offset, sizeof(size_t));
+    memcpy(&buffer_capacity, cmd_packet + header_ccsds_offset + sizeof(size_t), sizeof(size_t));
+    printf("BEFORE SENDING THROUGH NETWORK VERIFY: Packet length: %d BUFFER LENGTH: %ld -- buffer capacity: %ld -- size of size_t: %d !!! \n", cmd_packet_size, buffer_length, buffer_capacity, sizeof(size_t)); 
+    // DEBUG END -----
     int res = sendto(sock_fd_, cmd_packet, cmd_packet_size, 0, (const struct sockaddr *)&fsw_address_, sizeof(fsw_address_));
     
     if(res < 0)
@@ -94,9 +96,9 @@ size_t BasicCommunication::createCmdPacket(const uint16_t &_mid, const uint8_t &
    // 1 bytes: code
    // 1 bytes: checksum
    // 2 + 2 + 2 + 1 + 1 = 8 bytes
-   const unsigned short header_size = 8;
-   size_t packet_length = header_size + _data_size;
-   size_t packet_length_ccsds_offset = packet_length - 7;
+   const uint8_t header_size = 8;
+   uint16_t packet_length = header_size + _data_size;
+   uint16_t packet_length_ccsds_offset = packet_length - 7;
    
    unsigned char  cmd_header[header_size];
 
@@ -110,7 +112,7 @@ size_t BasicCommunication::createCmdPacket(const uint16_t &_mid, const uint8_t &
    cmd_header[7] = 0;
    
    printf("Printing header values \n");
-    for (unsigned short i = 0; i < header_size; i++) {
+    for (uint8_t i = 0; i < header_size; i++) {
         printf("%02x ", cmd_header[i]);
     } printf("\n");
 

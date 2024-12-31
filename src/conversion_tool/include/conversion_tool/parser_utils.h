@@ -30,3 +30,8 @@ bool extract_type_identifier(const std::string & full_type,
                              std::string &_interface_name, 
                              std::string &_interface_type);
 
+uint8_t* from_serialized_to_byte_array_2(const rcl_serialized_message_t* _serialized_msg,
+                                       const TypeSupport_t* _type_support,
+                                       const TypeInfo_t* _type_info,
+                                       size_t &_buffer_size, 
+                                       std::string &_error_msg);
