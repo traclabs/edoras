@@ -30,6 +30,7 @@ public:
 protected:
 
   bool parseComm();
+  void receiveTelemetry();
   bool loadCommandInfo( const std::vector<std::string> &_cmd_vals);
   bool addPublisher(const std::string &_topic_name, const std::string &_message_type);
   bool addSubscriber(const std::string &_topic_name, const std::string &_message_type);
@@ -48,7 +49,8 @@ protected:
 
   // Communication
   BasicCommunication bc_; 
-
+  rclcpp::TimerBase::SharedPtr timer_comm_tlm_;
+  
   //
   std::map<std::string, CmdInfo_t> cmd_info_;
 

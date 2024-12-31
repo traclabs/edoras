@@ -171,8 +171,29 @@ bool GroundConversion::parseConfigParams()
 bool GroundConversion::initCommunication() 
 {
    std::string error_str;
-   return bc_.initialize( own_port_, fsw_port_, fsw_ip_, error_str);
+   
+   // Initialize communication
+   RCLCPP_INFO(this->get_logger(), "*** Initializing Basic Communication");
+   if(!bc_.initialize( own_port_, fsw_port_, fsw_ip_, error_str))
+   {
+      RCLCPP_INFO(this->get_logger(), "Failed in initializing the Basic Communication module");
+      return false;
+   }
+   // Start communication timer
+   //timer_comm_tlm_ = this->create_wall_timer(std::chrono::milliseconds(1000), []() -> void { receiveTelemetry(); });
+   timer_comm_tlm_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&GroundConversion::receiveTelemetry, this));   	
+   
+   return true;
 }
+
+/**
+ * @function receiveTelemetry
+ */
+void GroundConversion::receiveTelemetry()
+{
+  bc_.receiveTlmPacket();
+}
+
 
 /**
  * @function subscriberCallback

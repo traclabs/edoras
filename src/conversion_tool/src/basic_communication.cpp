@@ -132,17 +132,21 @@ size_t BasicCommunication::createCmdPacket(const uint16_t &_mid, const uint8_t &
  * @function receiveTlmPacket
  */  
 bool BasicCommunication::receiveTlmPacket()
-{/*
-     int n; 
-     // Receive............
-    n = recvfrom(sockfd, (unsigned char*) buffer, MAXLINE, MSG_DONTWAIT, (struct sockaddr*)NULL, NULL);
-    if(n > 0)
-    {
-      struct Data* data2  = deserialize(buffer, n, 0);
-      printf("\t Data 2: Received message with bytes: %d . Age: %d . First name: %s . Last name: %s \n", n, data2->age, data2->first_name, data2->last_name);
-    }
-*/
-  return true;  
+{
+   ssize_t buffer_size; 
+   const int MAXLINE = 1024;
+   uint8_t buffer[MAXLINE];
+   // Receive............
+   // (unsigned char*)
+   buffer_size = recvfrom(sock_fd_, (uint8_t*) buffer, MAXLINE, MSG_DONTWAIT, (struct sockaddr*)NULL, NULL);
+   if(buffer_size > 0)
+   {
+      printf("Buffer size received: %ld !!!!!!!!!!!!!! \n", buffer_size);
+      //struct Data* data2  = deserialize(buffer, n, 0);
+      //printf("\t Data 2: Received message with bytes: %d . Age: %d . First name: %s . Last name: %s \n", n, data2->age, data2->first_name, data2->last_name);
+   }
+
+   return true;  
 }
 
 
