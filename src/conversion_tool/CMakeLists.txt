@@ -14,16 +14,18 @@ set(dependencies
   edoras_msgs
   sensor_msgs
   std_msgs
+  std_srvs
 )
 
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(rclpy REQUIRED)
 
-find_package(rclcpp REQUIRED)
-find_package(edoras_msgs REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(std_msgs REQUIRED)
+
+foreach(dep ${dependencies})
+  find_package(${dep} REQUIRED)
+endforeach()
+
 
 include_directories(include)
 

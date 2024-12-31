@@ -7,6 +7,8 @@
 
 #include <dlfcn.h>
 
+using namespace std::placeholders;
+
 typedef const rosidl_message_type_support_t * (* get_message_ts_func)();
 
 /**
@@ -179,6 +181,10 @@ bool GroundConversion::initCommunication()
       RCLCPP_INFO(this->get_logger(), "Failed in initializing the Basic Communication module");
       return false;
    }
+   
+   // Set up service
+   srv_to_lab_ = this->create_service<std_srvs::srv::SetBool>("to_lab_enable_output_cmd", std::bind(&GroundConversion::to_lab_enable_output_cmd, this, _1, _2));
+   
    // Start communication timer
    //timer_comm_tlm_ = this->create_wall_timer(std::chrono::milliseconds(1000), []() -> void { receiveTelemetry(); });
    timer_comm_tlm_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&GroundConversion::receiveTelemetry, this));   	
@@ -187,11 +193,49 @@ bool GroundConversion::initCommunication()
 }
 
 /**
+ * @function to_lab_enable_output_cmd
+ */
+void GroundConversion::to_lab_enable_output_cmd(const std::shared_ptr<std_srvs::srv::SetBool::Request> _req,
+                                                std::shared_ptr<std_srvs::srv::SetBool::Response> _res)
+{ 
+  bool enable = true;
+  _res->success = enableTOLabOutputCmd(enable);
+}
+
+/**
+ * @function enableTOLabOutputCmd
+ * @brief TODO: Enable/disable. For now, we are only enabling
+ */
+bool GroundConversion::enableTOLabOutputCmd(bool _enable)
+{  
+  // 1. Create command to enable TO LAB Output cmd
+  size_t  data_buffer_size = 16;
+  
+  char dest_ip[data_buffer_size];
+  strcpy(dest_ip, fsw_ip_.c_str());
+  uint8_t* data_buffer = (uint8_t*)( &dest_ip[0] );
+  
+  // 2. Sending command to activate telemetry to be sent back
+  // got this info from juicer_config/util/cfe_plugin_config.yaml
+  uint16_t mid = 0x1880; 
+  uint8_t code = 0x06;
+  uint16_t seq = 0;
+  
+  // Send data to cFS
+  RCLCPP_INFO(this->get_logger(), "Send TO LAB Enable output cmd, mid: %02x . Buffer size: %lu", mid, data_buffer_size);
+  return bc_.sendCmdPacket(mid, code, seq, &data_buffer, data_buffer_size);
+}
+
+/**
  * @function receiveTelemetry
  */
 void GroundConversion::receiveTelemetry()
-{
-  bc_.receiveTlmPacket();
+{ RCLCPP_INFO(this->get_logger(), "Checking for telemetry");
+  size_t buffer_size;
+  if( bc_.receiveTlmPacket(buffer_size))
+  {
+   RCLCPP_INFO(this->get_logger(), "Received telemetry packet of size: %ld ", buffer_size);
+  }
 }
 
 

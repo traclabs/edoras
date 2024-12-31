@@ -4,6 +4,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <conversion_tool/types.h>
 #include <conversion_tool/basic_communication.h>
+#include <std_srvs/srv/set_bool.hpp>
 
 struct CmdInfo_t {
   std::string msg_type;
@@ -26,6 +27,7 @@ public:
   GroundConversion();
   bool parseConfigParams();
   bool initCommunication();
+  bool enableTOLabOutputCmd(bool _enable);
 
 protected:
 
@@ -36,6 +38,8 @@ protected:
   bool addSubscriber(const std::string &_topic_name, const std::string &_message_type);
 
   void subscriberCallback(const std::shared_ptr<const rclcpp::SerializedMessage> _msg, const std::string &_topic_name);
+  void to_lab_enable_output_cmd(const std::shared_ptr<std_srvs::srv::SetBool::Request> _req,
+                                std::shared_ptr<std_srvs::srv::SetBool::Response> _res);
 
   void member_to_yaml(const rosidl_typesupport_introspection_c__MessageMember & member_info, uint8_t * member_data);
 
@@ -53,5 +57,8 @@ protected:
   
   //
   std::map<std::string, CmdInfo_t> cmd_info_;
+
+  // Helper to_lab_enable_output_cmd
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr srv_to_lab_; 
 
 };
