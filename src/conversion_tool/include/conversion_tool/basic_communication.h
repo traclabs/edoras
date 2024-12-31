@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <string>
 #include <cstring> // memset
+#include <vector>
 
 /**
  * @class BasicCommunication
@@ -26,7 +27,7 @@ class BasicCommunication
  bool sendCmdPacket(const uint16_t &_mid, const uint8_t &_code, 
                     const uint16_t &_seq, unsigned char** _data_buffer, 
                     const size_t &_data_size);
- bool receiveTlmPacket(size_t &_buffer_size);
+ bool receiveTlmPacket(size_t &_buffer_size, std::vector<uint8_t> &_header_debug);
  
  protected:
 
