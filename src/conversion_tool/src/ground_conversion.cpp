@@ -52,6 +52,39 @@ bool GroundConversion::parseComm()
   return false;
 }
 
+bool GroundConversion::loadTelemetryInfo( const std::vector<std::string> &_tlm_vals)
+{
+  for(auto tlm_key : _tlm_vals)
+  {
+     std::map<std::string, rclcpp::Parameter> tlm_params;
+     TlmInfo_t ti;
+
+     if (this->get_parameters(tlm_key, tlm_params))
+     { 
+      if(tlm_params.find("type") == tlm_params.end())
+        continue;
+      if(tlm_params.find("topic") == tlm_params.end())
+        continue;
+      if(tlm_params.find("mid") == tlm_params.end())
+        continue;
+      ti.msg_type = tlm_params["type"].as_string();
+      ti.topic = tlm_params["topic"].as_string();
+      ti.mid = tlm_params["mid"].as_int() & 0xFFFF;
+      
+      tlm_info_[ti.topic] = ti;       
+      
+      RCLCPP_INFO(this->get_logger(), "*** TLM: Got type: %s, topic: %s and mid: %02x %02x", ti.msg_type.c_str(), ti.topic.c_str(), 
+                  (ti.mid >> 8) & 0xFF, ti.mid & 0xFF);
+
+      // Add subscriber
+      this->addPublisher(ti.topic, ti.msg_type);
+     }
+     
+  } // for tlm 
+
+  return true;
+}
+
 /**
  * @file loadCommandInfo
  */
@@ -140,29 +173,7 @@ bool GroundConversion::parseConfigParams()
   }
 
   tlm_vals = tlm_param.as_string_array();
-
-
-  for(auto ti : tlm_vals)
-  {
-     std::map<std::string, rclcpp::Parameter> tlm_params;
-     std::string type_str, topic_str;
-
-     if (this->get_parameters(ti, tlm_params))
-     { 
-      if(tlm_params.find("type") == tlm_params.end())
-        continue;
-      if(tlm_params.find("topic") == tlm_params.end())
-        continue;
-
-      type_str = tlm_params["type"].as_string();
-      topic_str = tlm_params["topic"].as_string();
-      RCLCPP_INFO(this->get_logger(), "*** TLM: Got type and topic: %s and %s", type_str.c_str(), topic_str.c_str());
-
-      // Add subscriber
-      this->addPublisher(topic_str, type_str);
-     }
-     
-  } // for tlm 
+  loadTelemetryInfo(tlm_vals);
 
   return true;
 }
@@ -230,24 +241,44 @@ bool GroundConversion::enableTOLabOutputCmd(bool _enable)
  * @function receiveTelemetry
  */
 void GroundConversion::receiveTelemetry()
-{ RCLCPP_INFO(this->get_logger(), "Checking for telemetry");
+{ 
   size_t buffer_size;
   uint16_t mid;
   std::vector<uint8_t> tlm_header_debug;
   if( bc_.receiveTlmPacket(buffer_size, mid, tlm_header_debug))
-  {
-   uint16_t example = 0x0825;
-   RCLCPP_INFO(this->get_logger(), "Example mid: %02x %02x should be 0825 ******* ", 
-               (example >> 8) & 0xFF, example & 0xFF);   
-   RCLCPP_INFO(this->get_logger(), "Received telemetry packet of size: %ld . mid: %02x %02x******* ", 
-               buffer_size, (mid >> 8) & 0xFF, mid & 0xFF);
-   if(tlm_header_debug.size() > 0);
-   RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
-   tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
-   tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
+  {   
+     // Check if this telemetry's mid is one our application cares to hear
+     std::string topic_name;
+     if( hasMid(mid, topic_name) )
+     {  
+        RCLCPP_INFO(this->get_logger(), "Mid received (%04x) corresponds to topic: %s ", mid, topic_name.c_str());
+        RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
+         tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
+         tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
+         
+         // Publish data
+         //publishers_[topic_name]-> ;
+     }   
   }
 }
 
+/**
+ * @function hasMid
+ * @brief Check whether this mid corresponds to a tlm item indicated in the config yaml file 
+ */
+bool GroundConversion::hasMid(const uint16_t &_mid, std::string &_topic)
+{
+   for(auto ti : tlm_info_)
+   {
+      if(ti.second.mid == _mid)
+      {
+         _topic = ti.second.topic;
+         return true;
+      }
+   }
+   
+   return false;
+} 
 
 /**
  * @function subscriberCallback

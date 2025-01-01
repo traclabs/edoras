@@ -30,7 +30,7 @@ class TestPublisher : public rclcpp::Node
         count_++;
       };
 
-      timer_ = this->create_wall_timer(500ms, timer_callback);
+      timer_ = this->create_wall_timer(2000ms, timer_callback);
     }
 
     void sub_cb(const geometry_msgs::msg::Pose::SharedPtr _msg)

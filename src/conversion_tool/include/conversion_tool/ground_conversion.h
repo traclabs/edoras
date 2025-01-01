@@ -17,6 +17,13 @@ struct CmdInfo_t {
   const TypeInfo_t* type_info;
 };
 
+struct TlmInfo_t {
+  std::string msg_type;
+  std::string topic;
+  uint16_t mid;
+
+};
+
 /**
  * @class GroundConversion
  */
@@ -34,6 +41,9 @@ protected:
   bool parseComm();
   void receiveTelemetry();
   bool loadCommandInfo( const std::vector<std::string> &_cmd_vals);
+  bool loadTelemetryInfo( const std::vector<std::string> &_tlm_vals);
+  
+  bool hasMid(const uint16_t &_mid, std::string &_topic);
   bool addPublisher(const std::string &_topic_name, const std::string &_message_type);
   bool addSubscriber(const std::string &_topic_name, const std::string &_message_type);
 
@@ -57,7 +67,8 @@ protected:
   
   //
   std::map<std::string, CmdInfo_t> cmd_info_;
-
+  std::map<std::string, TlmInfo_t> tlm_info_;
+  
   // Helper to_lab_enable_output_cmd
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr srv_to_lab_; 
 
