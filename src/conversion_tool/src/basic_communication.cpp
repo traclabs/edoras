@@ -131,7 +131,7 @@ size_t BasicCommunication::createCmdPacket(const uint16_t &_mid, const uint8_t &
 /**
  * @function receiveTlmPacket
  */  
-bool BasicCommunication::receiveTlmPacket(size_t &_buffer_size, std::vector<uint8_t> &_header_debug )
+bool BasicCommunication::receiveTlmPacket(size_t &_buffer_size, uint16_t &_mid, std::vector<uint8_t> &_header_debug )
 {
    ssize_t buffer_size_rcvd; 
    const int MAXLINE = 1024;
@@ -148,8 +148,13 @@ bool BasicCommunication::receiveTlmPacket(size_t &_buffer_size, std::vector<uint
         _header_debug.clear();
         for(int i = 0; i < 8; ++i)
            _header_debug.push_back( buffer[i]);
+           
       }
+            
       // DEBUG -------------------
+      
+      // Get mid: First 2 bytes
+      _mid = ((uint16_t)buffer[0] << 8) | buffer[1];
       return true;
    }
 

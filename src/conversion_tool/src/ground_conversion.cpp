@@ -232,10 +232,15 @@ bool GroundConversion::enableTOLabOutputCmd(bool _enable)
 void GroundConversion::receiveTelemetry()
 { RCLCPP_INFO(this->get_logger(), "Checking for telemetry");
   size_t buffer_size;
+  uint16_t mid;
   std::vector<uint8_t> tlm_header_debug;
-  if( bc_.receiveTlmPacket(buffer_size, tlm_header_debug))
+  if( bc_.receiveTlmPacket(buffer_size, mid, tlm_header_debug))
   {
-   RCLCPP_INFO(this->get_logger(), "Received telemetry packet of size: %ld ", buffer_size);
+   uint16_t example = 0x0825;
+   RCLCPP_INFO(this->get_logger(), "Example mid: %02x %02x should be 0825 ******* ", 
+               (example >> 8) & 0xFF, example & 0xFF);   
+   RCLCPP_INFO(this->get_logger(), "Received telemetry packet of size: %ld . mid: %02x %02x******* ", 
+               buffer_size, (mid >> 8) & 0xFF, mid & 0xFF);
    if(tlm_header_debug.size() > 0);
    RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
    tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
