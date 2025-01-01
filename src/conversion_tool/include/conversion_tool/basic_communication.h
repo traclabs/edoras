@@ -27,7 +27,7 @@ class BasicCommunication
  bool sendCmdPacket(const uint16_t &_mid, const uint8_t &_code, 
                     const uint16_t &_seq, unsigned char** _data_buffer, 
                     const size_t &_data_size);
- bool receiveTlmPacket(size_t &_buffer_size, uint16_t &_mid, std::vector<uint8_t> &_header_debug);
+ bool receiveTlmPacket(uint16_t &_mid, uint8_t* _buffer, std::vector<uint8_t> &_header_debug);
  
  protected:
 

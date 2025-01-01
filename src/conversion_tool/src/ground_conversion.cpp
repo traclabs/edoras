@@ -242,10 +242,11 @@ bool GroundConversion::enableTOLabOutputCmd(bool _enable)
  */
 void GroundConversion::receiveTelemetry()
 { 
-  size_t buffer_size;
   uint16_t mid;
   std::vector<uint8_t> tlm_header_debug;
-  if( bc_.receiveTlmPacket(buffer_size, mid, tlm_header_debug))
+  
+  uint8_t* buffer;
+  if( bc_.receiveTlmPacket(mid, buffer, tlm_header_debug))
   {   
      // Check if this telemetry's mid is one our application cares to hear
      std::string topic_name;
@@ -257,7 +258,11 @@ void GroundConversion::receiveTelemetry()
          tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
          
          // Publish data
-         //publishers_[topic_name]-> ;
+         rcutils_uint8_array_t* serialized_array = nullptr;
+         serialized_array = make_serialized_array(buffer);
+         
+         rclcpp::SerializedMessage serialized_msg(*serialized_array);
+         publishers_[topic_name]->publish(serialized_msg);
      }   
   }
 }

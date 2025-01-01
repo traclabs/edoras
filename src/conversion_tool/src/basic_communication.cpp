@@ -130,31 +130,44 @@ size_t BasicCommunication::createCmdPacket(const uint16_t &_mid, const uint8_t &
   
 /**
  * @function receiveTlmPacket
+ * @brief Received buffer has:
+ * @brief  * TlmHeader (16 bytes) + 
+ * @brief  * buffer_length (8 bytes) + 
+ * @brief  * buffer_capacity (8 bytes) + 
+ * @brief  * msg_serialized
  */  
-bool BasicCommunication::receiveTlmPacket(size_t &_buffer_size, uint16_t &_mid, std::vector<uint8_t> &_header_debug )
+bool BasicCommunication::receiveTlmPacket(uint16_t &_mid, uint8_t* _buffer, std::vector<uint8_t> &_header_debug )
 {
-   ssize_t buffer_size_rcvd; 
+   ssize_t buffer_rcvd_size; 
    const int MAXLINE = 1024;
-   uint8_t buffer[MAXLINE];
+   uint8_t buffer_rcvd[MAXLINE];
+   
    // Receive............
    // (unsigned char*)
-   buffer_size_rcvd = recvfrom(sock_fd_, (uint8_t*) buffer, MAXLINE, MSG_DONTWAIT, (struct sockaddr*)NULL, NULL);
-   if(buffer_size_rcvd > 0)
+   buffer_rcvd_size = recvfrom(sock_fd_, (uint8_t*) buffer_rcvd, MAXLINE, MSG_DONTWAIT, (struct sockaddr*)NULL, NULL);
+   if(buffer_rcvd_size > 0)
    { 
-      _buffer_size = (size_t)buffer_size_rcvd;
       // DEBUG --------------------
-      if(buffer_size_rcvd > 8)
+      if(buffer_rcvd_size > 8)
       {
         _header_debug.clear();
         for(int i = 0; i < 8; ++i)
-           _header_debug.push_back( buffer[i]);
+           _header_debug.push_back( buffer_rcvd[i]);
            
       }
             
       // DEBUG -------------------
       
       // Get mid: First 2 bytes
-      _mid = ((uint16_t)buffer[0] << 8) | buffer[1];
+      _mid = ((uint16_t)buffer_rcvd[0] << 8) | buffer_rcvd[1];
+      
+      // Get buffer
+      size_t offset = 16; // tlm header
+      size_t buffer_size = (size_t) buffer_rcvd_size - offset;
+      _buffer = static_cast<uint8_t *>( malloc(buffer_size) );
+      
+      memcpy(&_buffer, &buffer_rcvd + offset, buffer_size);
+      
       return true;
    }
 

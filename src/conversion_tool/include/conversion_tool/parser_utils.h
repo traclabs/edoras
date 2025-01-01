@@ -22,6 +22,8 @@ uint8_t* from_rcutils_uint_array_to_uint_buffer(const rcl_serialized_message_t* 
                                                 size_t &_buffer_size, size_t &_msg_length, size_t&_msg_capacity);
 
 
+rcutils_uint8_array_t* make_serialized_array(const uint8_t* _buffer);
+
 const TypeInfo_t * get_type_info(const std::string  &_interface_name, 
                                  const std::string &_interface_type,
                                  std::string &_error_msg);
