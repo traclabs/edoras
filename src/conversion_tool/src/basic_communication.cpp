@@ -111,7 +111,7 @@ size_t BasicCommunication::createCmdPacket(const uint16_t &_mid, const uint8_t &
    cmd_header[6] = _code;
    cmd_header[7] = 0;
    
-   printf("Printing header values \n");
+   printf("BC: createCmdPacket: Header: ");
     for (uint8_t i = 0; i < header_size; i++) {
         printf("%02x ", cmd_header[i]);
     } printf("\n");
@@ -137,9 +137,8 @@ size_t BasicCommunication::createCmdPacket(const uint16_t &_mid, const uint8_t &
  * @brief  * msg_serialized
  */  
 bool BasicCommunication::receiveTlmPacket(uint16_t &_mid, uint8_t** _buffer, 
-                                          std::vector<uint8_t> &_header_debug, 
-                                          std::vector<uint8_t> &_buffer_test, 
-                                          size_t &_brs, size_t &_offset, size_t &_bs )
+                                          std::vector<uint8_t> &_header_debug,
+                                          size_t &_buffer_size )
 {
    size_t offset = 16; // tlm header: 8 primary + 4 secondary + 4 padding
    ssize_t buffer_rcvd_size; 
@@ -161,37 +160,17 @@ bool BasicCommunication::receiveTlmPacket(uint16_t &_mid, uint8_t** _buffer,
       _mid = ((uint16_t)buffer_rcvd[0] << 8) | buffer_rcvd[1];
       
       // Get buffer
-      size_t buffer_size = (size_t) buffer_rcvd_size - offset;
+      _buffer_size = (size_t) buffer_rcvd_size - offset;
       
-      // DEBUG
-      _brs = (size_t)buffer_rcvd_size;
-      _offset = offset;
-      _bs = buffer_size;
+      *_buffer = static_cast<uint8_t *>( malloc(_buffer_size) );
+      memcpy(*_buffer, buffer_rcvd + offset, _buffer_size);
 
-      printf("*-*- DEBUG For loop sizes: %ld -- buffer_rcvd_size: %ld offset: %ld \n", buffer_size, (size_t)buffer_rcvd_size, offset);
-      if(buffer_size> 1000)
-        return false;
-      if( _mid != 0x0827 )
-        return false;  
-        printf("Malloc to create the buffer \n");      
-      *_buffer = static_cast<uint8_t *>( malloc(buffer_size) );
-      printf("Copy to buffer \n");
-      memcpy(*_buffer, buffer_rcvd + offset, buffer_size);
-      printf("Copied to buffer okay! Buffer size: %ld. Contents:  \n", buffer_size);
       // See buffer contents
-      for(int i = 0; i < buffer_size; i++)
-      {
-        printf(" %02x ", *(*_buffer + i) );
+      /*for(int i = 0; i < _buffer_size; i++)
+      { printf(" %02x ", *(*_buffer + i) );
         if(i % 8 == 7)
           printf("\n");
-      } printf("\n");
-      // DEBUG
-      _buffer_test.clear();
-      for(size_t i = 0; i < buffer_size; i++)
-      {
-        //memcpy(&bi, _buffer + oi, sizeof(uint8_t));
-        _buffer_test.push_back( buffer_rcvd[offset + i] );
-      } 
+      } printf("\n");*/
          
       return true;
       

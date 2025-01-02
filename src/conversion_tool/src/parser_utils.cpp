@@ -110,7 +110,7 @@ uint8_t* from_serialized_to_byte_array_2(const rcl_serialized_message_t* _serial
   return data;
 }  
 
-rcutils_uint8_array_t* make_serialized_array(const uint8_t* _buffer, size_t &_bl, size_t &_bc)
+rcutils_uint8_array_t* make_serialized_array(const uint8_t* _buffer)
 {
   // Buffer:
   // size_t: (8 bytes) buffer_length
@@ -124,8 +124,6 @@ rcutils_uint8_array_t* make_serialized_array(const uint8_t* _buffer, size_t &_bl
   memcpy( &buffer_capacity, _buffer + offset, sizeof(size_t));
   offset += sizeof(size_t);
   
-   _bl = buffer_length; _bc = buffer_capacity;
-
   rcutils_uint8_array_t* serialized_array = new rcutils_uint8_array_t;
   rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
   

@@ -29,8 +29,7 @@ class BasicCommunication
                     const size_t &_data_size);
  bool receiveTlmPacket(uint16_t &_mid, uint8_t** _buffer, 
                        std::vector<uint8_t> &_header_debug, 
-                       std::vector<uint8_t> &_buffer_test,
-                       size_t &_brs, size_t &_offset, size_t &_bs);
+                       size_t &_buffer_size);
  
  protected:
 
