@@ -72,7 +72,7 @@ bool BasicCommunication::sendCmdPacket(const uint16_t &_mid, const uint8_t &_cod
     size_t buffer_length, buffer_capacity;
     memcpy(&buffer_length, cmd_packet + header_ccsds_offset, sizeof(size_t));
     memcpy(&buffer_capacity, cmd_packet + header_ccsds_offset + sizeof(size_t), sizeof(size_t));
-    printf("BEFORE SENDING THROUGH NETWORK VERIFY: Packet length: %d BUFFER LENGTH: %ld -- buffer capacity: %ld -- size of size_t: %d !!! \n", cmd_packet_size, buffer_length, buffer_capacity, sizeof(size_t)); 
+    printf("sendCmdPacket: Packet length: %d Buffer length: %ld -- capacity: %ld ! \n", cmd_packet_size, buffer_length, buffer_capacity); 
     // DEBUG END -----
     int res = sendto(sock_fd_, cmd_packet, cmd_packet_size, 0, (const struct sockaddr *)&fsw_address_, sizeof(fsw_address_));
     
@@ -136,8 +136,12 @@ size_t BasicCommunication::createCmdPacket(const uint16_t &_mid, const uint8_t &
  * @brief  * buffer_capacity (8 bytes) + 
  * @brief  * msg_serialized
  */  
-bool BasicCommunication::receiveTlmPacket(uint16_t &_mid, uint8_t* _buffer, std::vector<uint8_t> &_header_debug )
+bool BasicCommunication::receiveTlmPacket(uint16_t &_mid, uint8_t** _buffer, 
+                                          std::vector<uint8_t> &_header_debug, 
+                                          std::vector<uint8_t> &_buffer_test, 
+                                          size_t &_brs, size_t &_offset, size_t &_bs )
 {
+   size_t offset = 16; // tlm header: 8 primary + 4 secondary + 4 padding
    ssize_t buffer_rcvd_size; 
    const int MAXLINE = 1024;
    uint8_t buffer_rcvd[MAXLINE];
@@ -145,31 +149,53 @@ bool BasicCommunication::receiveTlmPacket(uint16_t &_mid, uint8_t* _buffer, std:
    // Receive............
    // (unsigned char*)
    buffer_rcvd_size = recvfrom(sock_fd_, (uint8_t*) buffer_rcvd, MAXLINE, MSG_DONTWAIT, (struct sockaddr*)NULL, NULL);
-   if(buffer_rcvd_size > 0)
+   if(buffer_rcvd_size > (ssize_t) offset)
    { 
       // DEBUG --------------------
-      if(buffer_rcvd_size > 8)
-      {
         _header_debug.clear();
         for(int i = 0; i < 8; ++i)
-           _header_debug.push_back( buffer_rcvd[i]);
-           
-      }
-            
+           _header_debug.push_back( buffer_rcvd[i]);            
       // DEBUG -------------------
       
       // Get mid: First 2 bytes
       _mid = ((uint16_t)buffer_rcvd[0] << 8) | buffer_rcvd[1];
       
       // Get buffer
-      size_t offset = 16; // tlm header
       size_t buffer_size = (size_t) buffer_rcvd_size - offset;
-      _buffer = static_cast<uint8_t *>( malloc(buffer_size) );
       
-      memcpy(&_buffer, &buffer_rcvd + offset, buffer_size);
-      
+      // DEBUG
+      _brs = (size_t)buffer_rcvd_size;
+      _offset = offset;
+      _bs = buffer_size;
+
+      printf("*-*- DEBUG For loop sizes: %ld -- buffer_rcvd_size: %ld offset: %ld \n", buffer_size, (size_t)buffer_rcvd_size, offset);
+      if(buffer_size> 1000)
+        return false;
+      if( _mid != 0x0827 )
+        return false;  
+        printf("Malloc to create the buffer \n");      
+      *_buffer = static_cast<uint8_t *>( malloc(buffer_size) );
+      printf("Copy to buffer \n");
+      memcpy(*_buffer, buffer_rcvd + offset, buffer_size);
+      printf("Copied to buffer okay! Buffer size: %ld. Contents:  \n", buffer_size);
+      // See buffer contents
+      for(int i = 0; i < buffer_size; i++)
+      {
+        printf(" %02x ", *(*_buffer + i) );
+        if(i % 8 == 7)
+          printf("\n");
+      } printf("\n");
+      // DEBUG
+      _buffer_test.clear();
+      for(size_t i = 0; i < buffer_size; i++)
+      {
+        //memcpy(&bi, _buffer + oi, sizeof(uint8_t));
+        _buffer_test.push_back( buffer_rcvd[offset + i] );
+      } 
+         
       return true;
-   }
+      
+   } // if buffer_rcvd_size > 0
 
    return false;  
 }

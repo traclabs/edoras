@@ -25,6 +25,14 @@ class TestPublisher : public rclcpp::Node
         message.angular.x = 0.0;
         message.angular.y = 0.0;
         message.angular.z = -0.3;
+        /*
+        auto message = geometry_msgs::msg::Pose();
+        message.position.x = 0.1;
+        message.position.y = 0.2;
+        message.position.z = 0.3;
+        message.orientation.z = 0.7;
+        message.orientation.w = 0.7;*/
+        
         this->publisher_twist_->publish(message);
 
         count_++;

@@ -245,22 +245,38 @@ void GroundConversion::receiveTelemetry()
   uint16_t mid;
   std::vector<uint8_t> tlm_header_debug;
   
-  uint8_t* buffer;
-  if( bc_.receiveTlmPacket(mid, buffer, tlm_header_debug))
+  uint8_t* buffer = NULL;  
+  std::vector<uint8_t> buffer_test; size_t brs, ofs, bs;
+  if( bc_.receiveTlmPacket(mid, &buffer, tlm_header_debug, buffer_test, brs, ofs, bs))
   {   
      // Check if this telemetry's mid is one our application cares to hear
      std::string topic_name;
      if( hasMid(mid, topic_name) )
-     {  
+     {   RCLCPP_INFO(this->get_logger(), "DEBUG: BRS: %ld ofs: %ld bs: %ld ", brs, ofs, bs);
         RCLCPP_INFO(this->get_logger(), "Mid received (%04x) corresponds to topic: %s ", mid, topic_name.c_str());
         RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
          tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
          tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
+
+        RCLCPP_INFO(this->get_logger(), "** >>>> Buffer received size (%ld): \n", bs);         
+         std::string s = "";
+         for(size_t i = 0; i < bs; i++)
+         {   
+             char bi[10];
+             sprintf(bi, "%02x", *(buffer + i) );
+             s = s +  " " + bi;
+             if(i % 8 == 7 )
+                 s = s + "\n";
+         }
+       
+               
+         RCLCPP_INFO(this->get_logger(), "** OUT Buffer received (%ld): \n %s ", bs, s.c_str());        
          
          // Publish data
          rcutils_uint8_array_t* serialized_array = nullptr;
-         serialized_array = make_serialized_array(buffer);
-         
+         size_t bl, bc;
+         serialized_array = make_serialized_array(buffer, bl, bc);
+         RCLCPP_INFO(this->get_logger(), "*-*- Test TLM: Buffer length: %ld capacity: %ld ", bl, bc);
          rclcpp::SerializedMessage serialized_msg(*serialized_array);
          publishers_[topic_name]->publish(serialized_msg);
      }   
