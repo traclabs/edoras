@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--dependency-file,CMakeFiles/send_command_message_to_edoras_app.dir/link.d CMakeFiles/send_command_message_to_edoras_app.dir/send_command_message_to_edoras_app.c.o -o send_command_message_to_edoras_app  libserialize_library.a

@@ -111,12 +111,12 @@ def generate_launch_description():
     # ***********************
     # Arm Comm
     # ***********************
-    #robot_comm_node = Node(
-    #    package="edoras_demos",
-    #    executable="arm_comm_udp_node",
-    #    name="arm_comm_udp_node",
-    #    output="screen",
-    #)    
+    robot_comm_node = Node(
+        package="edoras_demos",
+        executable="rover_comm_udp_node",
+        name="rover_comm_udp_node",
+        output="screen",
+    )    
 
     nodes_to_start = [
         mars_surface_rsp,
@@ -124,7 +124,7 @@ def generate_launch_description():
         mars_rover_jsp,
         fake_base_node,
         rviz_node,
-        #robot_comm_node
+        robot_comm_node
     ]
 
     return LaunchDescription(declared_arguments + nodes_to_start)

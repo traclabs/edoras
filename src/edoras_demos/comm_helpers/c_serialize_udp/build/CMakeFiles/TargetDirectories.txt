@@ -1,0 +1,8 @@
+/home/ana/ros2/edoras_ws/edoras/src/scratch/c_serialize_udp/build/CMakeFiles/serialize_library.dir
+/home/ana/ros2/edoras_ws/edoras/src/scratch/c_serialize_udp/build/CMakeFiles/serialize_test.dir
+/home/ana/ros2/edoras_ws/edoras/src/scratch/c_serialize_udp/build/CMakeFiles/server_serialize_1.dir
+/home/ana/ros2/edoras_ws/edoras/src/scratch/c_serialize_udp/build/CMakeFiles/server_serialize_2.dir
+/home/ana/ros2/edoras_ws/edoras/src/scratch/c_serialize_udp/build/CMakeFiles/header_serialize_test.dir
+/home/ana/ros2/edoras_ws/edoras/src/scratch/c_serialize_udp/build/CMakeFiles/send_command_message_to_edoras_app.dir
+/home/ana/ros2/edoras_ws/edoras/src/scratch/c_serialize_udp/build/CMakeFiles/edit_cache.dir
+/home/ana/ros2/edoras_ws/edoras/src/scratch/c_serialize_udp/build/CMakeFiles/rebuild_cache.dir

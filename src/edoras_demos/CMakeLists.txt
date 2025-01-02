@@ -44,6 +44,14 @@ ament_target_dependencies(arm_comm_udp_node ${dependencies} )
 target_link_libraries(arm_comm_udp_node arm_comm_udp)
 
 
+add_executable(rover_comm_udp_node
+    src/rover_comm_udp_node.cpp 
+    src/rover_comm_udp.cpp
+    src/serialize_rover_manual.cpp
+)
+ament_target_dependencies(rover_comm_udp_node ${dependencies} )
+
+
 add_executable(fake_base_cmd src/fake_base_cmd.cpp)
 ament_target_dependencies(fake_base_cmd ${dependencies} )
 
@@ -57,6 +65,7 @@ install(TARGETS
   serialize_manual
   arm_comm_udp
   arm_comm_udp_node
+  rover_comm_udp_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

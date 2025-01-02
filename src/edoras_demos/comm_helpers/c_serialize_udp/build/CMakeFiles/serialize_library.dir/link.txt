@@ -1,0 +1,2 @@
+/usr/bin/ar qc libserialize_library.a CMakeFiles/serialize_library.dir/serialize_library.c.o
+/usr/bin/ranlib libserialize_library.a
