@@ -1,12 +1,11 @@
 Panels:
   - Class: rviz_common/Displays
-    Help Height: 138
+    Help Height: 206
     Name: Displays
     Property Tree Widget:
-      Expanded:
-        - /mars_rover1/Status1
+      Expanded: ~
       Splitter Ratio: 0.38882681727409363
-    Tree Height: 1504
+    Tree Height: 1274
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -32,7 +31,7 @@ Visualization Manager:
       Cell Size: 1
       Class: rviz_default_plugins/Grid
       Color: 160; 160; 164
-      Enabled: true
+      Enabled: false
       Line Style:
         Line Width: 0.029999999329447746
         Value: Lines
@@ -45,7 +44,7 @@ Visualization Manager:
       Plane: XY
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
-      Value: true
+      Value: false
     - Alpha: 1
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
@@ -56,7 +55,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /gateway_body/robot_description
+        Value: /mars_surface/robot_description
       Enabled: true
       Links:
         All Links Enabled: true
@@ -64,10 +63,19 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        curiosity_path:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        world:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
       Mass Properties:
         Inertia: false
         Mass: false
-      Name: gateway_body
+      Name: mars_surface
       TF Prefix: ""
       Update Interval: 0
       Value: true
@@ -94,6 +102,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         arm_01_to_arm_02:
           Alpha: 1
           Show Axes: false
@@ -103,6 +112,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         arm_02_to_arm_03:
           Alpha: 1
           Show Axes: false
@@ -112,6 +122,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         arm_03_to_arm_04:
           Alpha: 1
           Show Axes: false
@@ -121,6 +132,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         arm_04_to_arm_tools:
           Alpha: 1
           Show Axes: false
@@ -130,6 +142,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         back_wheel_L:
           Alpha: 1
           Show Axes: false
@@ -157,6 +170,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         chassis_to_arm_01:
           Alpha: 1
           Show Axes: false
@@ -181,6 +195,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         lidar_link:
           Alpha: 1
           Show Axes: false
@@ -190,6 +205,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         mast_02_to_mast_cameras:
           Alpha: 1
           Show Axes: false
@@ -199,10 +215,12 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         mast_p:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         mast_p_to_mast_02:
           Alpha: 1
           Show Axes: false
@@ -222,10 +240,12 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         suspension_arm_B2_L:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         suspension_arm_B2_L_to_middle_wheel_L:
           Alpha: 1
           Show Axes: false
@@ -240,6 +260,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         suspension_arm_B2_R_to_middle_wheel_R:
           Alpha: 1
           Show Axes: false
@@ -254,6 +275,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         suspension_arm_B_L_to_B2_L:
           Alpha: 1
           Show Axes: false
@@ -263,6 +285,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         suspension_arm_B_R_to_B2_R:
           Alpha: 1
           Show Axes: false
@@ -272,6 +295,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         suspension_arm_F_L_to_suspension_steer_F_L:
           Alpha: 1
           Show Axes: false
@@ -281,6 +305,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         suspension_arm_F_R_to_suspension_steer_F_R:
           Alpha: 1
           Show Axes: false
@@ -290,6 +315,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         suspension_steer_B_L_to_back_wheel_L:
           Alpha: 1
           Show Axes: false
@@ -299,6 +325,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         suspension_steer_B_R_to_back_wheel_R:
           Alpha: 1
           Show Axes: false
@@ -308,6 +335,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         suspension_steer_F_L_to_front_wheel_L:
           Alpha: 1
           Show Axes: false
@@ -317,6 +345,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         suspension_steer_F_R_to_front_wheel_R:
           Alpha: 1
           Show Axes: false
@@ -332,8 +361,8 @@ Visualization Manager:
       Visual Enabled: true
   Enabled: true
   Global Options:
-    Background Color: 0; 0; 0
-    Fixed Frame: base_link
+    Background Color: 255; 190; 111
+    Fixed Frame: world
     Frame Rate: 30
   Name: root
   Tools:
@@ -376,7 +405,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 7.54707670211792
+      Distance: 8.869909286499023
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -391,10 +420,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.13539829850196838
+      Pitch: 0.33039867877960205
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.373582363128662
+      Yaw: 3.650428295135498
     Saved: ~
 Window Geometry:
   Displays:
@@ -402,7 +431,7 @@ Window Geometry:
   Height: 2022
   Hide Left Dock: false
   Hide Right Dock: true
-  QMainWindow State: 000000ff00000000fd0000000400000000000002d5000006dcfc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b000000b200fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c0061007900730100000070000006dc0000018600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000015d00000479fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a005600690065007700730000000070000004790000013800fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000e7c0000005efc0100000002fb0000000800540069006d0065010000000000000e7c0000047a00fffffffb0000000800540069006d0065010000000000000450000000000000000000000b9b000006dc00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000003740000066efc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000010800fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c00610079007301000000a20000066e0000024200fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000015d00000479fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000007000000479000001ca00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000e7c00000082fc0100000002fb0000000800540069006d0065010000000000000e7c000006a100fffffffb0000000800540069006d0065010000000000000450000000000000000000000af60000066e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -412,5 +441,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 3708
-  X: 132
-  Y: 64
+  X: 198
+  Y: 96

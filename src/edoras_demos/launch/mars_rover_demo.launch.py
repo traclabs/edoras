@@ -30,8 +30,8 @@ def generate_launch_description():
     mars_surface_xacro = Command([
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
-            PathJoinSubstitution([FindPackageShare("simulation"), 'models', 'curiosity_path',
-            'urdf', 'curiosity_mars_rover.xacro']),
+            PathJoinSubstitution([FindPackageShare("edoras_demos"),
+            'robots', 'mars_scene.urdf.xacro']),
         ])
     mars_surface_robot_description = {"robot_description": mars_surface_xacro}
 
@@ -71,7 +71,29 @@ def generate_launch_description():
         namespace="mars_rover"
     )
 
+    # *************************
+    # Fake base cmd
+    # *************************
+    # ros2 topic pub --rate 30 /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.1, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}"
+    fake_base_node = Node(
+        package="edoras_demos",
+        executable="fake_base_cmd",
+        name="fake_base_cmd",
+        output="screen",
+        parameters=[
+          {'cmd_vel': 'cmd_vel'},
+          {'base_link_frame': 'base_footprint'},
+          {'planning_frame': 'world'},
+          {'x': 0.0},
+          {'y': 0.0},
+          {'z': 0.0},
+          {'roll': 0.0},
+          {'pitch': 0.0},
+          {'yaw': 0.0}                              
+        ], # big_arm/
 
+        #arguments=["-d", rviz_config_file],
+    )    
 
     rviz_config_file = PathJoinSubstitution(
         [FindPackageShare("edoras_demos"), "rviz", "mars_rover_demo.rviz"]
@@ -97,9 +119,10 @@ def generate_launch_description():
     #)    
 
     nodes_to_start = [
-        #mars_surface_rsp,
+        mars_surface_rsp,
         mars_rover_rsp,
         mars_rover_jsp,
+        fake_base_node,
         rviz_node,
         #robot_comm_node
     ]

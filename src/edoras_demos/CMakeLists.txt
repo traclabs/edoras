@@ -13,6 +13,8 @@ set(dependencies
   rclcpp
   sensor_msgs
   std_msgs
+  tf2_geometry_msgs
+  tf2_ros
 )
 
 find_package(ament_cmake REQUIRED)
@@ -20,6 +22,8 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
 include_directories(include)
 
@@ -39,12 +43,17 @@ add_executable(arm_comm_udp_node src/arm_comm_udp_node.cpp)
 ament_target_dependencies(arm_comm_udp_node ${dependencies} )
 target_link_libraries(arm_comm_udp_node arm_comm_udp)
 
+
+add_executable(fake_base_cmd src/fake_base_cmd.cpp)
+ament_target_dependencies(fake_base_cmd ${dependencies} )
+
 ament_export_dependencies(
 #  rclcpp
   ${dependencies}
 )
 
 install(TARGETS
+  fake_base_cmd
   serialize_manual
   arm_comm_udp
   arm_comm_udp_node
@@ -56,6 +65,7 @@ install(TARGETS
 install(DIRECTORY
   launch
   rviz
+  robots
   DESTINATION share/${PROJECT_NAME}/
 )
 
