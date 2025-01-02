@@ -22,6 +22,7 @@ class BasicCommunication
  bool initialize(const int &_own_port, 
 		 const int &_fsw_port,
 		 const std::string &_fsw_ip, 
+		 const std::string &_telemetry_ip,
 		 std::string &_error_msg);
  
  bool sendCmdPacket(const uint16_t &_mid, const uint8_t &_code, 

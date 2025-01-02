@@ -40,12 +40,19 @@ bool GroundConversion::parseComm()
         return false;
       if(comm_params.find("fsw_ip") == comm_params.end())
         return false;
+      if(comm_params.find("telemetry_ip") == comm_params.end())
+        return false;
+      if(comm_params.find("bridge_ip") == comm_params.end())
+        return false;
 
       own_port_ = comm_params["bridge_port"].as_int();
-      fsw_port_ = comm_params["fsw_port"].as_int();      
+      fsw_port_ = comm_params["fsw_port"].as_int();
       fsw_ip_ = comm_params["fsw_ip"].as_string();
+      fsw_ip_ = comm_params["fsw_ip"].as_string();
+      telemetry_ip_ = comm_params["telemetry_ip"].as_string();
+      bridge_ip_ = comm_params["bridge_ip"].as_string();
 
-      RCLCPP_INFO(this->get_logger(), "Got bridge port: %d fsw port: %d fsw_ip: %s ", own_port_, fsw_port_, fsw_ip_.c_str());
+      RCLCPP_INFO(this->get_logger(), "** ParseComm: \n * bridge port: %d \n * fsw port: %d \n * fsw_ip: %s  telemetry_ip: %s \n * bridge_ip: %s ", own_port_, fsw_port_, fsw_ip_.c_str(), telemetry_ip_.c_str(), bridge_ip_.c_str());
       return true;
   }
 
@@ -187,7 +194,7 @@ bool GroundConversion::initCommunication()
    
    // Initialize communication
    RCLCPP_INFO(this->get_logger(), "*** Initializing Basic Communication");
-   if(!bc_.initialize( own_port_, fsw_port_, fsw_ip_, error_str))
+   if(!bc_.initialize( own_port_, fsw_port_, fsw_ip_, telemetry_ip_, error_str))
    {
       RCLCPP_INFO(this->get_logger(), "Failed in initializing the Basic Communication module");
       return false;
@@ -223,7 +230,7 @@ bool GroundConversion::enableTOLabOutputCmd(bool _enable)
   size_t  data_buffer_size = 16;
   
   char dest_ip[data_buffer_size];
-  strcpy(dest_ip, fsw_ip_.c_str());
+  strcpy(dest_ip, bridge_ip_.c_str());
   uint8_t* data_buffer = (uint8_t*)( &dest_ip[0] );
   
   // 2. Sending command to activate telemetry to be sent back
@@ -244,9 +251,9 @@ void GroundConversion::receiveTelemetry()
 { 
   uint16_t mid;
   std::vector<uint8_t> tlm_header_debug;
-  
   uint8_t* buffer = NULL;  
   size_t buffer_size;
+
   if( bc_.receiveTlmPacket(mid, &buffer, tlm_header_debug, buffer_size))
   {   
      // Check if this telemetry's mid is one our application cares to hear

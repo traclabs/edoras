@@ -18,7 +18,8 @@ BasicCommunication::BasicCommunication()
  */ 
 bool BasicCommunication::initialize( const int &_own_port, 
 			             const int &_fsw_port,
-			             const std::string &_fsw_ip, 
+			             const std::string &_fsw_ip,
+			             const std::string &_telemetry_ip,
 			             std::string &_error_msg)
 {
     // Create socket
@@ -34,7 +35,7 @@ bool BasicCommunication::initialize( const int &_own_port,
   
     // Fill server information
     own_address_.sin_family = AF_INET;
-    own_address_.sin_addr.s_addr = inet_addr("127.0.0.1"); //INADDR_ANY;
+    own_address_.sin_addr.s_addr = inet_addr(_telemetry_ip.c_str()); //"127.0.0.1" INADDR_ANY;
     own_address_.sin_port = htons(_own_port);
 
 
@@ -44,7 +45,7 @@ bool BasicCommunication::initialize( const int &_own_port,
     fsw_address_.sin_port = htons(_fsw_port);
   
     // Bind the socket
-    int res = bind(sock_fd_, (const struct sockaddr*)&own_address_, sizeof(own_address_));
+    int res = bind(sock_fd_, (struct sockaddr*)&own_address_, sizeof(own_address_));
     if( res < 0 )
     {
        _error_msg = "Bind failed";

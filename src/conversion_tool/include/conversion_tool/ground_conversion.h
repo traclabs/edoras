@@ -63,6 +63,10 @@ protected:
   int own_port_;
   int fsw_port_;
   std::string fsw_ip_;
+  std::string telemetry_ip_;
+
+  // For Phase I easiness
+  std::string bridge_ip_;
 
   // Communication
   BasicCommunication bc_; 

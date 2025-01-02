@@ -6,6 +6,10 @@ ground_conversion_node:
       bridge_port: 1235
       fsw_port: 1234	
       fsw_ip: "127.0.0.1"
+      telemetry_ip: "0.0.0.0"
+
+      # Phase I helper
+      bridge_ip: "127.0.0.1"
   
     command: ['cmd_twist']
     telemetry: ['tlm_pose']
