@@ -71,6 +71,7 @@ protected:
   // Communication
   BasicCommunication bc_; 
   rclcpp::TimerBase::SharedPtr timer_comm_tlm_;
+  int tlm_rate_ms_;
   
   //
   std::map<std::string, CmdInfo_t> cmd_info_;

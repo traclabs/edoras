@@ -19,7 +19,7 @@ ARGUMENTS = [
 #####################################
 def generate_launch_description():
 
-  config = os.path.join(get_package_share_directory('conversion_tool'), 'config', 'ground_conversion_bridge_rover.yaml')
+  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'rover', 'ground_bridge_multihost.yaml')
   conversion_node = Node(
           package='conversion_tool',
           executable='ground_conversion_node',

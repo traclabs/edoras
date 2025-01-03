@@ -19,7 +19,7 @@ ARGUMENTS = [
 #####################################
 def generate_launch_description():
 
-  config = os.path.join(get_package_share_directory('conversion_tool'), 'config', 'ground_conversion_bridge_rover_multihost.yaml')
+  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'rover', 'ground_bridge.yaml')
   conversion_node = Node(
           package='conversion_tool',
           executable='ground_conversion_node',
@@ -28,16 +28,24 @@ def generate_launch_description():
           parameters=[config]
           ) 
 
-  test_publish_node = Node(
-          package='conversion_tool',
-          executable='test_publisher_rover',
-          name='test_publisher_rover',
+  #test_publish_node = Node(
+  #        package='conversion_tool',
+  #        executable='test_publisher_rover',
+  #        name='test_publisher_rover',
+  #        output='screen'
+  #        ) 
+
+  steering_node = Node(
+          package='rqt_robot_steering',
+          executable='rqt_robot_steering',
+          name='send_robot_steering',
           output='screen'
-          ) 
+          )
 
   ld = LaunchDescription(ARGUMENTS)
   ld.add_action(conversion_node)
-  ld.add_action(test_publish_node)
+  #ld.add_action(test_publish_node)
+  ld.add_action(steering_node)
   return ld
   
 

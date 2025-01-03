@@ -112,14 +112,13 @@ size_t BasicCommunication::createCmdPacket(const uint16_t &_mid, const uint8_t &
    cmd_header[6] = _code;
    cmd_header[7] = 0;
    
-   printf("BC: createCmdPacket: Header: ");
+   // DEBUG
+   /*printf("BC: createCmdPacket: Header: ");
     for (uint8_t i = 0; i < header_size; i++) {
         printf("%02x ", cmd_header[i]);
-    } printf("\n");
-
+    } printf("\n");*/
 
    // Add header bytes on top of the serialized data
-   //*_cmd_packet = (unsigned char*) calloc(1, packet_length);
    size_t offset = 0;
   
    memcpy(*_cmd_packet + offset, &cmd_header, sizeof(cmd_header));  offset += sizeof(cmd_header);

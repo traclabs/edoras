@@ -50,21 +50,9 @@ bool SerializeRoverManual::initializeComm( const int &_own_port,
 bool SerializeRoverManual::sendMessage( geometry_msgs::msg::Pose* _ps )
 {    
     uint8_t* buf     = NULL;
-    printf("Sending message....\n");
     size_t         bufSize = serialize(_ps, &buf);
-    printf("Buff size: %ld \n", bufSize);
-    
-    printf("checking buffer \n");
-    size_t offset = 0;
-    for(int i = 0; i < 7; ++i)
-    {
-       double vi;
-       memcpy(&vi, buf + offset, sizeof(double)); offset += sizeof(double);
-       printf("%f ", vi);
-    } printf(" ******* \n");
     int res = sendto(sockfd_, buf, bufSize, 0, (const struct sockaddr *)&other_address_, sizeof(other_address_));
- 
- 
+  
     // Clean up
     free(buf);
     

@@ -75,6 +75,7 @@ install(DIRECTORY
   launch
   rviz
   robots
+  config
   DESTINATION share/${PROJECT_NAME}/
 )
 

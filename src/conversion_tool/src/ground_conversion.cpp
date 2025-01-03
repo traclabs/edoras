@@ -21,8 +21,7 @@ rclcpp::Node("ground_conversion",
                .allow_undeclared_parameters(true)
                .automatically_declare_parameters_from_overrides(true))
 {
-   //this->declare_parameter("command", rclcpp::PARAMETER_STRING_ARRAY);
-   //this->declare_parameter("telemetry", rclcpp::PARAMETER_STRING_ARRAY);
+   tlm_rate_ms_ = 100; // Every 100 ms check for new incoming data (10Hz)
 }
 
 /**
@@ -204,8 +203,7 @@ bool GroundConversion::initCommunication()
    srv_to_lab_ = this->create_service<std_srvs::srv::SetBool>("to_lab_enable_output_cmd", std::bind(&GroundConversion::to_lab_enable_output_cmd, this, _1, _2));
    
    // Start communication timer
-   //timer_comm_tlm_ = this->create_wall_timer(std::chrono::milliseconds(1000), []() -> void { receiveTelemetry(); });
-   timer_comm_tlm_ = this->create_wall_timer(std::chrono::milliseconds(1000), std::bind(&GroundConversion::receiveTelemetry, this));   	
+   timer_comm_tlm_ = this->create_wall_timer(std::chrono::milliseconds(tlm_rate_ms_), std::bind(&GroundConversion::receiveTelemetry, this));   	
    
    return true;
 }
@@ -260,10 +258,11 @@ void GroundConversion::receiveTelemetry()
      std::string topic_name;
      if( hasMid(mid, topic_name) )
      {  
-        RCLCPP_INFO(this->get_logger(), "Mid received (%04x) corresponds to topic: %s ", mid, topic_name.c_str());
-        RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
-         tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
-         tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
+        // DEBUG
+        //RCLCPP_INFO(this->get_logger(), "Mid received (%04x) corresponds to topic: %s ", mid, topic_name.c_str());
+        //RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
+        // tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
+        // tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
 
          // Debug
          //std::string s = getBufferString(buffer, buffer_size);                   
@@ -284,6 +283,7 @@ void GroundConversion::receiveTelemetry()
      
      }   
   }
+
 }
 
 /**
@@ -353,7 +353,7 @@ void GroundConversion::subscriberCallback(const std::shared_ptr<const rclcpp::Se
   uint16_t seq = 0;
   
   // Send data to cFS
-  RCLCPP_INFO(this->get_logger(), "Send cmd packet, mid: %02x . Buffer size: %lu", mid, data_buffer_size);
+  //RCLCPP_INFO(this->get_logger(), "DEBUG: Sending cmd packet, mid: %02x . Buffer size: %lu", mid, data_buffer_size);
   bc_.sendCmdPacket(mid, code, seq, &data_buffer, data_buffer_size);  
 }
 
