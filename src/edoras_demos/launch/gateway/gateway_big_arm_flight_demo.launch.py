@@ -96,13 +96,13 @@ def generate_launch_description():
 
 
     rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare("edoras_demos"), "rviz", "gateway_big_arm_demo.rviz"]
+        [FindPackageShare("edoras_demos"), "rviz", "gateway_big_arm_flight_demo.rviz"]
     )
 
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
-        name="rviz2",
+        name="rviz2_flight",
         output="screen",
         arguments=["-d", rviz_config_file],
         condition=IfCondition(rviz)

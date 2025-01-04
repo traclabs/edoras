@@ -82,7 +82,7 @@ size_t SerializeArmManual::serialize(sensor_msgs::msg::JointState *_js, uint8_t*
      return 0;
 
    size_t num_joints = _js->position.size();
-   size_t data_size = num_joints * sizeof(double);
+   size_t data_size = num_joints * sizeof(double) + sizeof(int32_t) + sizeof(uint32_t); // joints + sec + nanosec
    
    *_buf = static_cast<uint8_t *> (malloc(data_size));
    if (*_buf)
@@ -98,6 +98,14 @@ size_t SerializeArmManual::serialize(sensor_msgs::msg::JointState *_js, uint8_t*
         offset += sizeof(double);
       }
 
+     int32_t sec = _js->header.stamp.sec;
+     uint32_t nanosec = _js->header.stamp.nanosec;
+     
+     memcpy(*_buf + offset, &sec, sizeof(int32_t));
+     offset += sizeof(int32_t);
+     memcpy(*_buf + offset, &nanosec, sizeof(uint32_t));
+     offset += sizeof(uint32_t);
+     printf("Should be sending sec: %d nanosec: %d \n", sec, nanosec);
      return data_size;
            
    } else

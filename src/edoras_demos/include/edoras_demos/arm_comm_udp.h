@@ -11,6 +11,7 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 
 #include <edoras_demos/serialize_arm_manual.h>
+#include <trac_ik/trac_ik.hpp>
 
 class ArmCommUdp : public rclcpp::Node {
 
@@ -39,5 +40,15 @@ protected:
   int robot_port_;
   
   sensor_msgs::msg::JointState joint_state_;
+  std::shared_ptr<TRAC_IK::TRAC_IK> trac_ik_;
+
+  std::string base_link_;
+  std::string tip_link_;
+  std::string robot_description_;
+  double max_time_; 
+  double eps_;
+  TRAC_IK::SolveType solve_type_;
+
+
 };
 

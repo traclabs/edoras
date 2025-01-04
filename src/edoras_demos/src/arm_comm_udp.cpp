@@ -5,8 +5,16 @@ using std::placeholders::_1;
 
 ArmCommUdp::ArmCommUdp() :
 Node("arm_comm_udp")
-{
-
+{   
+   base_link_ = "big_arm_link_0";
+   tip_link_ = "big_arm_link_8";
+   robot_description_ = "robot_description";
+   eps_ = 1e-5;
+   max_time_ = 0.005;   
+   solve_type_ = TRAC_IK::Speed;
+   
+   trac_ik_.reset( new TRAC_IK::TRAC_IK(this->create_sub_node("trac_ik"), base_link_, tip_link_, 
+                   robot_description_, max_time_, eps_, solve_type_) );
 }
 
 
