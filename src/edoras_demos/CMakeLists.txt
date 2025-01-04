@@ -16,6 +16,7 @@ set(dependencies
   tf2_geometry_msgs
   tf2_ros
   trac_ik_lib
+  tf2_kdl
 )
 
 find_package(ament_cmake REQUIRED)
@@ -34,6 +35,10 @@ add_executable(arm_comm_udp_node
 )
 ament_target_dependencies(arm_comm_udp_node ${dependencies} )
 
+add_executable(arm_ground_command 
+  src/arm_ground_command.cpp
+)
+ament_target_dependencies(arm_ground_command ${dependencies} )
 
 add_executable(rover_comm_udp_node
     src/rover_comm_udp_node.cpp 
@@ -53,6 +58,7 @@ ament_export_dependencies(
 
 install(TARGETS
   fake_base_cmd
+  arm_ground_command
   arm_comm_udp_node
   rover_comm_udp_node
   DESTINATION lib/${PROJECT_NAME}

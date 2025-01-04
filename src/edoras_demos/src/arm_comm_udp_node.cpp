@@ -7,12 +7,13 @@ int main(int argc, char * argv[])
   auto node = std::make_shared<ArmCommUdp>();
   
   std::string js_topic = "/big_arm/joint_states";
+  std::string jc_topic = "/big_arm/joint_state_command";
   int cfs_port = 8080;
   int robot_port = 8585;
   int tlm_ms = 2000;
   int cmd_ms = 100;
   
-  node->initRobotComm(js_topic);
+  node->initRobotComm(js_topic, jc_topic);
   
   if(!node->initUdpComm(cfs_port, robot_port))
   {
@@ -22,7 +23,10 @@ int main(int argc, char * argv[])
   
   node->initRest(tlm_ms, cmd_ms);  
 
-  rclcpp::spin(node);
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(node);
+  executor.spin();
   rclcpp::shutdown();
+
   return 0;
 }

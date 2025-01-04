@@ -105,7 +105,6 @@ size_t SerializeArmManual::serialize(sensor_msgs::msg::JointState *_js, uint8_t*
      offset += sizeof(int32_t);
      memcpy(*_buf + offset, &nanosec, sizeof(uint32_t));
      offset += sizeof(uint32_t);
-     printf("Should be sending sec: %d nanosec: %d \n", sec, nanosec);
      return data_size;
            
    } else

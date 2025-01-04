@@ -64,9 +64,11 @@ def generate_launch_description():
         namespace="big_arm"
     )
     big_arm_jsp = Node(
-        package="joint_state_publisher_gui",
-        executable="joint_state_publisher_gui",
-        namespace="big_arm"
+        package="joint_state_publisher",
+        executable="joint_state_publisher",
+        namespace="big_arm",
+        parameters=[
+         {'source_list': ['joint_state_command'] }]
     )
 
     # *************************
@@ -115,6 +117,9 @@ def generate_launch_description():
         package="edoras_demos",
         executable="arm_comm_udp_node",
         name="arm_comm_udp_node",
+        parameters=[
+          {"robot_description": big_arm_xacro},
+        ],
         output="screen",
     )    
 
