@@ -176,6 +176,15 @@ Visualization Manager:
       Update Interval: 0
       Value: false
       Visual Enabled: true
+    - Class: rviz_default_plugins/InteractiveMarkers
+      Enable Transparency: true
+      Enabled: true
+      Interactive Markers Namespace: /arm_ground_command
+      Name: arm_ground_command
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 0; 0; 0
@@ -258,5 +267,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 687
-  X: 658
-  Y: 243
+  X: 227
+  Y: 244

@@ -17,6 +17,7 @@ set(dependencies
   tf2_ros
   trac_ik_lib
   tf2_kdl
+  interactive_markers
 )
 
 find_package(ament_cmake REQUIRED)
