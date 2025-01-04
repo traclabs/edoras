@@ -7,20 +7,21 @@ int main(int argc, char * argv[])
   auto node = std::make_shared<ArmCommUdp>();
   
   std::string js_topic = "/big_arm/joint_states";
+  int cfs_port = 8080;
+  int robot_port = 8585;
+  int tlm_ms = 2000;
+  int cmd_ms = 100;
   
-  RCLCPP_INFO(node->get_logger(), "Init robot comm");
   node->initRobotComm(js_topic);
   
-  RCLCPP_INFO(node->get_logger(), "Init udp comm");
-  if(!node->initUdpComm())
+  if(!node->initUdpComm(cfs_port, robot_port))
   {
     RCLCPP_ERROR(node->get_logger(), "Error initializing communication");
     return 1;
   }
   
-  RCLCPP_INFO(node->get_logger(), "Init rest");
-  node->initRest();
-    RCLCPP_INFO(node->get_logger(), "Spin...");
+  node->initRest(tlm_ms, cmd_ms);  
+
   rclcpp::spin(node);
   rclcpp::shutdown();
   return 0;

@@ -17,24 +17,26 @@ bool ArmCommUdp::initRobotComm(const std::string &_js_topic)
 }
 
 
-bool ArmCommUdp::initUdpComm()
+bool ArmCommUdp::initUdpComm(const int &_cfs_port, 
+                             const int &_robot_port)
 {
-   int own_port = 8585; // robot port
-   int cfs_port = 8080;
+   cfs_port_ = _cfs_port;
+   robot_port_ = _robot_port;
+   
    std::string error_msg;
    
-   if(!sm_.initializeComm(own_port, cfs_port, error_msg))
-     return false;
-     
-   return true;
+   return sm_.initializeComm(robot_port_, cfs_port_, error_msg);
 }
 
-bool ArmCommUdp::initRest()
+bool ArmCommUdp::initRest(const int &_tlm_ms, const int &_cmd_ms)
 {
-   timer_ = this->create_wall_timer(
-      std::chrono::milliseconds(2000),
+   timer_tlm_ = this->create_wall_timer(
+      std::chrono::milliseconds(_tlm_ms),
       std::bind(&ArmCommUdp::send_telemetry, this));
 
+   timer_cmd_ = this->create_wall_timer(
+      std::chrono::milliseconds(_cmd_ms),
+      std::bind(&ArmCommUdp::rcv_command, this));
 
    return true;
 }
@@ -50,12 +52,33 @@ void ArmCommUdp::send_telemetry()
    // Send it back
    if(js.name.size() == 0)
      return;
-   RCLCPP_INFO(this->get_logger(), "Sending telemetry!");
-   RCLCPP_INFO(this->get_logger(), " Joints: %f %f %f %f %f %f %f", js.position[0], js.position[1], js.position[2], js.position[3], js.position[4], js.position[5], js.position[6] );    
+
+   RCLCPP_INFO(this->get_logger(), "Sending telemetry: sensor_msgs::JointState serialized as 7 joint values");
+   RCLCPP_INFO(this->get_logger(), " Joints: %f %f %f %f %f %f %f", js.position[0], js.position[1], js.position[2], js.position[3], js.position[4], js.position[5], js.position[6] );
+       
    if(!sm_.sendMessage(&js))
      RCLCPP_ERROR(this->get_logger(), "Error sending message");
 }
 
+/**
+ * @function rcv_command
+ */
+void ArmCommUdp::rcv_command()
+{
+  geometry_msgs::msg::Pose cmd;
+
+  if(sm_.receiveMessage(cmd))
+  {
+    RCLCPP_INFO(this->get_logger(), "Received pose command: %f %f %f -- %f %f %f %f", cmd.position.x, cmd.position.y, cmd.position.z, cmd.orientation.x, cmd.orientation.y, cmd.orientation.z, cmd.orientation.w);
+    
+    // Do IK magic
+    //pub_twist_->publish(cmd);
+  }  
+}
+
+/**
+ * @function js_cb
+ */
 void ArmCommUdp::js_cb(const sensor_msgs::msg::JointState::SharedPtr _msg)
 {
   mux_.lock();

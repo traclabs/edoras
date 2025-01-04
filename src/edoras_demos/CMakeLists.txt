@@ -27,21 +27,13 @@ find_package(tf2_geometry_msgs REQUIRED)
 
 include_directories(include)
 
-add_library(serialize_manual SHARED src/serialize_manual.cpp)
-ament_target_dependencies(serialize_manual
-  ${dependencies}
+
+add_executable(arm_comm_udp_node 
+  src/arm_comm_udp_node.cpp
+  src/arm_comm_udp.cpp
+  src/serialize_arm_manual.cpp
 )
-
-add_library(arm_comm_udp SHARED src/arm_comm_udp.cpp)
-ament_target_dependencies(arm_comm_udp
-  ${dependencies}
-)
-target_link_libraries(arm_comm_udp serialize_manual)
-
-
-add_executable(arm_comm_udp_node src/arm_comm_udp_node.cpp)
 ament_target_dependencies(arm_comm_udp_node ${dependencies} )
-target_link_libraries(arm_comm_udp_node arm_comm_udp)
 
 
 add_executable(rover_comm_udp_node
@@ -62,8 +54,6 @@ ament_export_dependencies(
 
 install(TARGETS
   fake_base_cmd
-  serialize_manual
-  arm_comm_udp
   arm_comm_udp_node
   rover_comm_udp_node
   DESTINATION lib/${PROJECT_NAME}

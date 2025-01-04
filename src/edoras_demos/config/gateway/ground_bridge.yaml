@@ -1,0 +1,25 @@
+ground_conversion_node:
+
+  ros__parameters:
+  
+    communication:
+      bridge_port: 1235
+      fsw_port: 1234	
+      fsw_ip: "127.0.0.1"
+      telemetry_ip: "0.0.0.0"
+
+      # Phase I helper
+      bridge_ip: "127.0.0.1"
+  
+    command: ['cmd_pose']
+    telemetry: ['tlm_joint_state']
+
+    cmd_pose:
+      type: "geometry_msgs/msg/Pose"
+      topic: "command_pose"
+      mid: 0x1827 # EDORAS_APP_CMD_MID 
+
+    tlm_joint_state:
+      type: "sensor_msgs/msg/JointState"
+      topic: "telemetry_joint_state"
+      mid: 0x827 # EDORAS_APP_TLM_MID

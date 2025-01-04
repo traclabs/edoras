@@ -96,5 +96,3 @@ void RoverCommUdp::rcv_command()
     pub_twist_->publish(cmd);
   }  
 }
-
-
