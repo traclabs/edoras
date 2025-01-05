@@ -62,7 +62,7 @@ bool RoverCommUdp::initRest(const int &_tlm_ms, const int &_cmd_ms)
 void RoverCommUdp::send_telemetry()
 {
   // Check robot pose
-  auto time_now = rclcpp::Time(0);
+  auto time_now = this->now();
   tf_buffer_->canTransform(base_link_frame_, fixed_frame_, time_now, rclcpp::Duration(std::chrono::seconds(3)));
   auto robot_tf = tf_buffer_->lookupTransform(fixed_frame_, base_link_frame_, tf2::TimePointZero);
 
@@ -79,9 +79,10 @@ void RoverCommUdp::send_telemetry()
      return;
      
    RCLCPP_INFO(this->get_logger(), "Sending telemetry: geometry_msgs::Pose serialized as 7 doubles");
-   RCLCPP_INFO(this->get_logger(), " pos: %f %f %f orient: %f %f %f %f", 
+   RCLCPP_INFO(this->get_logger(), " pos: %f %f %f orient: %f %f %f %f. Time: %d %d", 
                ps.pose.position.x, ps.pose.position.y, ps.pose.position.z, 
-               ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w);
+               ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w,
+               ps.header.stamp.sec, ps.header.stamp.nanosec);
        
    if(!sm_.sendMessage(&ps))
      RCLCPP_ERROR(this->get_logger(), "Error sending message");
