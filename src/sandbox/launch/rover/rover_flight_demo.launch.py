@@ -96,7 +96,7 @@ def generate_launch_description():
     )    
 
     rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare("edoras_demos"), "rviz", "rover_flight_demo.rviz"]
+        [FindPackageShare("edoras_demos"), "rviz", "mars_rover_demo.rviz"]
     )
 
     rviz_node = Node(

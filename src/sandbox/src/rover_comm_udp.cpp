@@ -62,26 +62,22 @@ bool RoverCommUdp::initRest(const int &_tlm_ms, const int &_cmd_ms)
 void RoverCommUdp::send_telemetry()
 {
   // Check robot pose
-  auto time_now = rclcpp::Time(0);
-  tf_buffer_->canTransform(base_link_frame_, fixed_frame_, time_now, rclcpp::Duration(std::chrono::seconds(3)));
+  tf_buffer_->canTransform(base_link_frame_, fixed_frame_, rclcpp::Time(0), rclcpp::Duration(std::chrono::seconds(3)));
   auto robot_tf = tf_buffer_->lookupTransform(fixed_frame_, base_link_frame_, tf2::TimePointZero);
 
-  robot_pose_.pose.orientation = robot_tf.transform.rotation;
-  robot_pose_.pose.position.x = robot_tf.transform.translation.x;  
-  robot_pose_.pose.position.y = robot_tf.transform.translation.y;  
-  robot_pose_.pose.position.z = robot_tf.transform.translation.z;  
-  robot_pose_.header.stamp = time_now;     
+  robot_pose_.orientation = robot_tf.transform.rotation;
+  robot_pose_.position.x = robot_tf.transform.translation.x;  
+  robot_pose_.position.y = robot_tf.transform.translation.y;  
+  robot_pose_.position.z = robot_tf.transform.translation.z;  
        
   auto ps = robot_pose_;     
        
    // Send it back
-   if(ps.pose.orientation.w == 0)
+   if(ps.orientation.w == 0)
      return;
      
    RCLCPP_INFO(this->get_logger(), "Sending telemetry: geometry_msgs::Pose serialized as 7 doubles");
-   RCLCPP_INFO(this->get_logger(), " pos: %f %f %f orient: %f %f %f %f", 
-               ps.pose.position.x, ps.pose.position.y, ps.pose.position.z, 
-               ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w);
+   RCLCPP_INFO(this->get_logger(), " pos: %f %f %f orient: %f %f %f %f", ps.position.x, ps.position.y, ps.position.z, ps.orientation.x, ps.orientation.y, ps.orientation.z, ps.orientation.w);
        
    if(!sm_.sendMessage(&ps))
      RCLCPP_ERROR(this->get_logger(), "Error sending message");
@@ -100,3 +96,5 @@ void RoverCommUdp::rcv_command()
     pub_twist_->publish(cmd);
   }  
 }
+
+

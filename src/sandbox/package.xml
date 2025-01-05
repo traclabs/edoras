@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>sandbox</name>
+  <version>0.0.1</version>
+  <description>Phase I prototyping package for ROS2->cFS messages</description>
+  <maintainer email="ana@traclabs.com">Ana C. Huaman Quispe</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rviz_rendering</depend>
+
+  <depend>rclcpp</depend>
+  <depend>dynmsg</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+  
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+
+</package>

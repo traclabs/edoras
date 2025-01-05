@@ -1,0 +1,9 @@
+Ground bridge
+
+Receives cFS message, publishes it as ROS2 (telemetry)
+Receives ROS2 topic publishes it as cFS (command)
+
+Flight bridge
+
+Receives cFS message, publishes it as ROS2 topic (command to robot)
+Receives ROS2 message, publishes it as cFS (robot telemetry)

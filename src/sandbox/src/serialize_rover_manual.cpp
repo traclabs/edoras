@@ -47,7 +47,7 @@ bool SerializeRoverManual::initializeComm( const int &_own_port,
 /**
  * @function sendMessage
  */  
-bool SerializeRoverManual::sendMessage( geometry_msgs::msg::PoseStamped* _ps )
+bool SerializeRoverManual::sendMessage( geometry_msgs::msg::Pose* _ps )
 {    
     uint8_t* buf     = NULL;
     size_t         bufSize = serialize(_ps, &buf);
@@ -78,17 +78,15 @@ bool SerializeRoverManual::receiveMessage(geometry_msgs::msg::Twist &_tm)
 }
 /////////////////////////////
 
-size_t SerializeRoverManual::serialize(geometry_msgs::msg::PoseStamped *_ps, uint8_t** _buf)
+size_t SerializeRoverManual::serialize(geometry_msgs::msg::Pose *_ps, uint8_t** _buf)
 {
    // 7 : 3 (position=xyz) + 4 (orientation=xyzw) float64 == double
-   size_t data_size =  7*sizeof(double) + sizeof(int32_t) + sizeof(uint32_t);
+   size_t data_size =  7*sizeof(double);
    
    *_buf = static_cast<uint8_t *> (malloc(data_size));
    if (*_buf)
    {
-      double data[7] = { _ps->pose.position.x, _ps->pose.position.y, _ps->pose.position.z, 
-                       _ps->pose.orientation.x, _ps->pose.orientation.y, 
-                       _ps->pose.orientation.z, _ps->pose.orientation.w };
+      double data[7] = { _ps->position.x, _ps->position.y, _ps->position.z, _ps->orientation.x, _ps->orientation.y, _ps->orientation.z, _ps->orientation.w };
 
       size_t offset = 0;
       for(int i = 0; i < 7; ++i)
@@ -96,14 +94,6 @@ size_t SerializeRoverManual::serialize(geometry_msgs::msg::PoseStamped *_ps, uin
         memcpy(*_buf + offset, &data[i], sizeof(double) );
         offset += sizeof(double);
       }
-
-      int32_t sec = _ps->header.stamp.sec;
-      uint32_t nanosec = _ps->header.stamp.nanosec;
-      
-      memcpy(*_buf + offset, &sec, sizeof(int32_t) );
-      offset += sizeof(int32_t);
-      memcpy(*_buf + offset, &nanosec, sizeof(uint32_t) );
-      offset += sizeof(uint32_t);      
 
      return data_size;
            

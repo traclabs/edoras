@@ -7,7 +7,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/twist.hpp>
-#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
@@ -42,7 +42,7 @@ protected:
   std::string fixed_frame_;
   std::string base_link_frame_;
   
-  geometry_msgs::msg::PoseStamped robot_pose_;
+  geometry_msgs::msg::Pose robot_pose_;
   std::string cmd_vel_topic_;
   
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;

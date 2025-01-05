@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="curiosity_path">
+
+  <link name="world"/>
+  
+  <link name="curiosity_path">
+    <visual>
+      <geometry>
+        <mesh filename="package://simulation/models/curiosity_path/meshes/mars_path_simple1.dae" scale="1.0 1.0 1.0"/>
+      </geometry>
+    </visual>
+    <collision> 
+      <geometry>
+        <mesh filename="package://simulation/models/curiosity_path/meshes/curiosity_path.stl" scale="1.0 1.0 1.0"/>
+      </geometry>
+    </collision>    
+
+    
+  </link>
+  
+  <!-- Origin just set to make rover look good, not a specific value -->
+  <joint name="joint_mars_surface" type="fixed">
+    <parent link="world"/>
+    <child link="curiosity_path"/>
+    <origin xyz="0.0 0.0 7.5" rpy="0 0 0"/>
+  </joint>
+
+</robot>
+
+
+

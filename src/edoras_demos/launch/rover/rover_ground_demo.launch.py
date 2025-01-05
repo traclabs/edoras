@@ -9,7 +9,7 @@ from launch.conditions import IfCondition, UnlessCondition
 
 ARGUMENTS = [
     DeclareLaunchArgument('rviz', default_value='true',
-                          description='Open rviz to see robot state back'),
+                          description='rviz in Ground'),
     DeclareLaunchArgument('odom_in_cfs', default_value='rover_app_get_robot_odom',
                           description='topic name for odom cfs tlm'),
 ]
@@ -22,11 +22,9 @@ ARGUMENTS = [
 def generate_launch_description():
 
   rviz = LaunchConfiguration("rviz")
-
-  # ********************************
-  # Conversion Bridge in Ground
-  # ********************************
-  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'gateway', 'ground_bridge.yaml')
+  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'rover', 'ground_bridge.yaml')
+  
+  # Bridge
   conversion_node = Node(
           package='conversion_tool',
           executable='ground_conversion_node',
@@ -35,32 +33,16 @@ def generate_launch_description():
           parameters=[config]
           ) 
 
-  # **************************
-  #  Big Arm
-  # **************************
-  big_arm_xacro = Command([
-            PathJoinSubstitution([FindExecutable(name="xacro")]),
-            " ",
-            PathJoinSubstitution([FindPackageShare("gateway_description"), "robots", "big_arm.urdf.xacro"]),
-        ])
-  big_arm_robot_description = {"robot_description": big_arm_xacro}
-
-  big_arm_rsp = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        name="ground_rsp",
-        remappings=[
-          ('/ground/joint_states', '/telemetry_joint_state')
-        ],
-        parameters=[
-            big_arm_robot_description,
-            {'frame_prefix': 'ground/'}], # big_arm/
-        namespace="ground",
-        output="both",
-  )
-
+  # Send commands
+  steering_node = Node(
+          package='rqt_robot_steering',
+          executable='rqt_robot_steering',
+          name='send_robot_steering',
+          output='screen'
+          )
+  # View telemetry back
   rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare("edoras_demos"), "rviz", "gateway_big_arm_ground_demo.rviz"]
+        [FindPackageShare("edoras_demos"), "rviz", "rover_ground_demo.rviz"]
   )
 
   rviz_node = Node(
@@ -70,20 +52,12 @@ def generate_launch_description():
         output="screen",
         arguments=["-d", rviz_config_file],
         condition=IfCondition(rviz)
-  )
-
-  arm_command_node = Node(
-          package='edoras_demos',
-          executable='arm_ground_command',
-          name='arm_ground_command',
-          output='screen'
-          ) 
+  )  
 
   ld = LaunchDescription(ARGUMENTS)
   ld.add_action(conversion_node)
-  ld.add_action(big_arm_rsp)
+  ld.add_action(steering_node)
   ld.add_action(rviz_node)
-  ld.add_action(arm_command_node)
 
   return ld
   

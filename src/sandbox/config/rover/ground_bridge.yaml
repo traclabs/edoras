@@ -1,0 +1,25 @@
+ground_conversion_node:
+
+  ros__parameters:
+  
+    communication:
+      bridge_port: 1235
+      fsw_port: 1234	
+      fsw_ip: "127.0.0.1"
+      telemetry_ip: "0.0.0.0"
+
+      # Phase I helper
+      bridge_ip: "127.0.0.1"
+  
+    command: ['cmd_twist']
+    telemetry: ['tlm_pose']
+
+    cmd_twist:
+      type: "geometry_msgs/msg/Twist"
+      topic: "command_twist"
+      mid: 0x1827 # GATEWAY_APP_CMD_MID 
+
+    tlm_pose:
+      type: "geometry_msgs/msg/Pose"
+      topic: "telemetry_pose"
+      mid: 0x827 # GATEWAY_APP_TLM_MID
