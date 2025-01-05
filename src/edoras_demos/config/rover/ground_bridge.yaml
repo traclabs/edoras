@@ -16,7 +16,7 @@ ground_conversion_node:
 
     cmd_twist:
       type: "geometry_msgs/msg/Twist"
-      topic: "command_twist"
+      topic: "cmd_vel"
       mid: 0x1827 # GATEWAY_APP_CMD_MID 
 
     tlm_pose:

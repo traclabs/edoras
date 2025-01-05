@@ -81,7 +81,7 @@ def generate_launch_description():
         name="fake_base_cmd",
         output="screen",
         parameters=[
-          {'cmd_vel': 'cmd_vel'},
+          {'cmd_vel': 'simulate_control_vel'},
           {'base_link_frame': 'base_footprint'},
           {'planning_frame': 'world'},
           {'x': 0.0},

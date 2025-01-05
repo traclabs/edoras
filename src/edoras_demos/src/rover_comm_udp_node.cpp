@@ -8,7 +8,7 @@ int main(int argc, char * argv[])
 
   std::string fixed_frame = "world";
   std::string base_link_frame = "base_footprint";
-  std::string cmd_vel_topic = "cmd_vel";
+  std::string cmd_vel_topic = "simulate_control_vel";
   int cfs_port = 8080;
   int robot_port = 8585;
   int tlm_ms = 2000;
