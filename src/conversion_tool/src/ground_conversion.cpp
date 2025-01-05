@@ -122,7 +122,7 @@ bool GroundConversion::loadCommandInfo( const std::vector<std::string> &_cmd_val
       ci.library = rclcpp::get_typesupport_library(
                    ci.interface_name + "/" + ci.interface_type, 
                    "rosidl_typesupport_c");
-      ci.type_support = rclcpp::get_message_typesupport_handle(
+      ci.type_support = rclcpp::get_typesupport_handle(
                         ci.interface_name + "/" + ci.interface_type, 
                         "rosidl_typesupport_c", *ci.library);
       std::string error_msg;
@@ -370,7 +370,7 @@ bool GroundConversion::addSubscriber(const std::string &_topic_name, const std::
  
  auto sub = this->create_generic_subscription(_topic_name, _message_type,
       rclcpp::QoS(1), 
-      [this, _topic_name](std::shared_ptr<const rclcpp::SerializedMessage> _msg, const rclcpp::MessageInfo & _mi)
+      [this, _topic_name](std::shared_ptr<const rclcpp::SerializedMessage> _msg)
       {
          this->subscriberCallback(_msg, _topic_name);
       } );
@@ -379,6 +379,7 @@ bool GroundConversion::addSubscriber(const std::string &_topic_name, const std::
 
   return true;
 }
+
 
 
 /**

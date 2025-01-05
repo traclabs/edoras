@@ -1,6 +1,7 @@
 
 #include <conversion_tool/debug_utils.h>
 #include <rosidl_typesupport_introspection_c/field_types.h>
+#include <rosidl_runtime_c/string.h>
 #include <rclcpp/rclcpp.hpp>
 
 void debug_parse_message(uint8_t* _data_buffer, const TypeInfo_t *_type_info)
