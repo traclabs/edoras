@@ -72,6 +72,7 @@ install(DIRECTORY
   rviz
   robots
   config
+  worlds
   DESTINATION share/${PROJECT_NAME}/
 )
 
