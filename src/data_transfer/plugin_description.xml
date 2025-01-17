@@ -1,0 +1,19 @@
+<library path="brash_application_tools_rviz_plugins">
+  <class name="brash_application_tools/Canadarm"
+         type="brash_application_tools::CanadarmPanel"
+         base_class_type="rviz_common::Panel">
+    <description>
+      A panel widget allowing simple arm motion.
+    </description>
+  </class>
+
+  <class name="brash_application_tools/MarsRover"
+         type="brash_application_tools::MarsRoverPanel"
+         base_class_type="rviz_common::Panel">
+    <description>
+      A panel widget for CFDP test.
+    </description>
+  </class>
+
+
+</library>

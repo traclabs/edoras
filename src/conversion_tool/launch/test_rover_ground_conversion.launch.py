@@ -23,9 +23,9 @@ def generate_launch_description():
   conversion_node = Node(
           package='conversion_tool',
           executable='ground_conversion_node',
-          name=LaunchConfiguration("name"),
+          name='ground_conversion_node',
           output='screen',
-          parameters=[LaunchConfiguration("config")]
+          parameters=[config]
           ) 
 
   test_publish_node = Node(

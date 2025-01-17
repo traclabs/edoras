@@ -6,10 +6,10 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 
 ARGUMENTS = [
-    DeclareLaunchArgument('config', default_value='',
-                          description='Configuration file for bridge'),
-    DeclareLaunchArgument('name', default_value='conversion_node',
-                          description='Name of ground conversion node'),
+    DeclareLaunchArgument('twist_out_cfs', default_value='rover_app_send_robot_command',
+                          description='topic name for twist cfs cmd'),
+    DeclareLaunchArgument('odom_in_cfs', default_value='rover_app_get_robot_odom',
+                          description='topic name for odom cfs tlm'),
 ]
 
 # If you want to use ros2 node list, sometimes the nodes do not appear
@@ -23,9 +23,9 @@ def generate_launch_description():
   conversion_node = Node(
           package='conversion_tool',
           executable='ground_conversion_node',
-          name=LaunchConfiguration("name"),
+          name='ground_conversion_node',
           output='screen',
-          parameters=[LaunchConfiguration("config")]
+          parameters=[config]
           ) 
 
   test_publish_node = Node(
