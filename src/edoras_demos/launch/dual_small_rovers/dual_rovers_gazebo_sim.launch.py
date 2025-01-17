@@ -115,7 +115,7 @@ def generate_launch_description():
     
     
     bridge_config_file = os.path.join(
-        edoras_demos_share_dir, 'config', "dual_small_rovers", "bridge.yaml")
+        edoras_demos_share_dir, 'config', "dual_small_rovers", "gz_bridge.yaml")
 
 
     bridge = Node(

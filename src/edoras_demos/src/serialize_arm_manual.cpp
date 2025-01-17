@@ -8,7 +8,7 @@ SerializeArmManual::SerializeArmManual()
 {} 
  
 bool SerializeArmManual::initializeComm( const int &_own_port, 
-                                         const int &_other_port, 
+                                         const int &_other_port,
                                          std::string &_error_msg)
 {
     // Create socket

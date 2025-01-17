@@ -7,13 +7,7 @@ from launch.conditions import IfCondition, UnlessCondition
 
 def generate_launch_description():
     declared_arguments = []
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "example_arg",
-            default_value='false',
-            description="example arg to show how to do this",
-        )
-    )
+
     declared_arguments.append(
         DeclareLaunchArgument(
             "rviz",
@@ -21,7 +15,6 @@ def generate_launch_description():
             description="launch rviz",
         )
     )
-    example_arg = LaunchConfiguration("example_arg")
     rviz = LaunchConfiguration("rviz")
 
     # *****************************
@@ -109,7 +102,7 @@ def generate_launch_description():
     )
 
     # ***********************
-    # Arm Comm
+    # Rover Comm
     # ***********************
     robot_comm_node = Node(
         package="edoras_demos",
@@ -119,8 +112,8 @@ def generate_launch_description():
         parameters=[
          {'cfs_port': 8080},
          {'robot_port': 8585},
-         {'cfs_ip': "127.0.0.1"},
-         {'robot_ip': "127.0.0.1"}
+         {'cfs_ip': "10.5.0.3"},
+         {'robot_ip': "10.5.0.4"}
         ]
     )    
 

@@ -2,11 +2,10 @@ import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution, FindExecutable
 from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition, UnlessCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 ARGUMENTS = [
     DeclareLaunchArgument('rviz', default_value='true',
@@ -23,6 +22,16 @@ ARGUMENTS = [
 def generate_launch_description():
 
   rviz = LaunchConfiguration("rviz")
+  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'rover', 'ground_bridge.yaml')
+  
+  # Bridge
+  conversion_node = Node(
+          package='conversion_tool',
+          executable='ground_conversion_node',
+          name='ground_conversion_node',
+          output='screen',
+          parameters=[config]
+          ) 
 
   # Send commands
   steering_node = Node(
@@ -36,7 +45,6 @@ def generate_launch_description():
         [FindPackageShare("edoras_demos"), "rviz", "rover_ground_demo.rviz"]
   )
 
-  # Rviz to see telemetry back
   rviz_node = Node(
         package="rviz2",
         executable="rviz2",
@@ -45,21 +53,12 @@ def generate_launch_description():
         arguments=["-d", rviz_config_file],
         condition=IfCondition(rviz)
   )  
-  
-  # Edoras Bridge
-  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'rover', 'ground_bridge_multihost.yaml')
-  edoras_bridge = IncludeLaunchDescription(
-      PythonLaunchDescriptionSource([os.path.join(
-         get_package_share_directory('conversion_tool'), 
-         'launch', 'conversion.launch.py')]),
-      launch_arguments={'config': config}.items()
-    )
-  
+
   ld = LaunchDescription(ARGUMENTS)
+  ld.add_action(conversion_node)
   ld.add_action(steering_node)
   ld.add_action(rviz_node)
-  ld.add_action(edoras_bridge)
-  
+
   return ld
   
 

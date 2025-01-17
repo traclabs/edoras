@@ -6,20 +6,34 @@ using std::placeholders::_1;
 RoverCommUdp::RoverCommUdp() :
 Node("rover_comm_udp")
 {
-
+  this->declare_parameter("fixed_frame", std::string("world"));
+  this->declare_parameter("base_link_frame", std::string("base_footprint"));
+  this->declare_parameter("cmd_vel_topic", std::string("simulate_control_vel"));
+    
+  this->declare_parameter("cfs_port", 8080);
+  this->declare_parameter("robot_port", 8585);  
+  this->declare_parameter("cfs_ip", std::string("127.0.0.1"));
+  this->declare_parameter("robot_ip", std::string("127.0.0.1"));    
 }
 
 /** 
  * @function initRobotComm
  * @brief ROS2 stuff to talk to/control the robot
  */
-bool RoverCommUdp::initRobotComm(const std::string &_fixed_frame, 
-                    const std::string &_base_link_frame, 
-                    const std::string &_cmd_vel_topic)
+bool RoverCommUdp::initRobotComm()
 { 
-  fixed_frame_ = _fixed_frame;
-  base_link_frame_ = _base_link_frame;
-  cmd_vel_topic_ = _cmd_vel_topic;
+  std::string fixed_frame;
+  std::string base_link_frame;
+  std::string cmd_vel_topic;
+
+  this->get_parameter("fixed_frame", fixed_frame);  
+  this->get_parameter("base_link_frame", base_link_frame);
+  this->get_parameter("cmd_vel_topic", cmd_vel_topic);  
+
+
+  fixed_frame_ = fixed_frame;
+  base_link_frame_ = base_link_frame;
+  cmd_vel_topic_ = cmd_vel_topic;
   
   pub_twist_ = this->create_publisher<geometry_msgs::msg::Twist>(cmd_vel_topic_, 10);
   
@@ -32,15 +46,29 @@ bool RoverCommUdp::initRobotComm(const std::string &_fixed_frame,
 }
 
 
-bool RoverCommUdp::initUdpComm(const int &_cfs_port, 
-                               const int &_robot_port)
+bool RoverCommUdp::initUdpComm()
 {
-   cfs_port_ = _cfs_port;
-   robot_port_ = _robot_port;
+  int cfs_port;
+  int robot_port;
+  std::string cfs_ip;
+  std::string robot_ip;
+    
+  this->get_parameter("cfs_port", cfs_port);  
+  this->get_parameter("robot_port", robot_port);
+  this->get_parameter("cfs_ip", cfs_ip);  
+  this->get_parameter("robot_ip", robot_ip);      
+
+  RCLCPP_INFO(this->get_logger(), "** initUdpComm: cfs port: %d cfs ip: %s robot port: %d robot ip: %s", 
+              cfs_port, cfs_ip.c_str(), robot_port, robot_ip.c_str());
+
+   cfs_port_ = cfs_port;
+   robot_port_ = robot_port;
+   cfs_ip_ = cfs_ip;
+   robot_ip_ = robot_ip;
    
    std::string error_msg;
    
-   return sm_.initializeComm(robot_port_, cfs_port_, error_msg);
+   return sm_.initializeComm(robot_port_, cfs_port_, robot_ip_, cfs_ip_, error_msg);
 }
 
 bool RoverCommUdp::initRest(const int &_tlm_ms, const int &_cmd_ms)
@@ -72,7 +100,7 @@ void RoverCommUdp::send_telemetry()
   robot_pose_.pose.position.z = robot_tf.transform.translation.z;  
   robot_pose_.header.stamp = time_now;     
        
-  auto ps = robot_pose_;     
+  auto ps = robot_pose_;
        
    // Send it back
    if(ps.pose.orientation.w == 0)
