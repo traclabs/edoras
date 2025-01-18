@@ -18,8 +18,8 @@ class ArmCommUdp : public rclcpp::Node {
 public:
 
   ArmCommUdp();
-  bool initRobotComm(const std::string &_joint_state, const std::string &_joint_command);
-  bool initUdpComm(const int &_cfs_port, const int &_robot_port);
+  bool initRobotComm();
+  bool initUdpComm();
   bool initRest(const int &_tlm_ms, const int &_cmd_ms);
   
 protected:
@@ -43,7 +43,9 @@ protected:
   SerializeArmManual sm_;
   int cfs_port_;
   int robot_port_;
-  
+  std::string cfs_ip_;
+  std::string robot_ip_;
+    
   sensor_msgs::msg::JointState joint_state_;
   std::shared_ptr<TRAC_IK::TRAC_IK> trac_ik_;
   std::shared_ptr<rclcpp::Node> trac_ik_sub_node_;
