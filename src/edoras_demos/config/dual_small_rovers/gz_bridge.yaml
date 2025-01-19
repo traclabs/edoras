@@ -38,18 +38,18 @@
 #  lazy: true
   direction: GZ_TO_ROS
 
-#- ros_topic_name: "/robot_1/tf"
-#  gz_topic_name: "/robot_1/tf_gazebo"
-#  ros_type_name: "tf2_msgs/msg/TFMessage"
-#  gz_type_name: "ignition.msgs.Pose_V" 
-##  lazy: true
-#  direction: GZ_TO_ROS
+- ros_topic_name: "/robot_1/pose"
+  gz_topic_name: "/model/robot_1/pose"
+  ros_type_name: "geometry_msgs/msg/PoseStamped"
+  gz_type_name: "ignition.msgs.Pose" 
+#  lazy: true
+  direction: GZ_TO_ROS
 
-- ros_topic_name: "/tf"
-  gz_topic_name: "model/robot_1/pose"
-  ros_type_name: "tf2_msgs/msg/TFMessage"
-  gz_type_name: "gz.msgs.Pose_V"
-  direction: GZ_TO_ROS  
+#- ros_topic_name: "/tf"
+#  gz_topic_name: "model/robot_1/pose"
+#  ros_type_name: "tf2_msgs/msg/TFMessage"
+#  gz_type_name: "gz.msgs.Pose_V"
+#  direction: GZ_TO_ROS  
   
 #####################
 ## Robot 2         ##
@@ -84,18 +84,18 @@
 #  lazy: true
   direction: GZ_TO_ROS
 
-#- ros_topic_name: "/robot_2/tf"
-#  gz_topic_name: "/robot_2/tf_gazebo"
-#  ros_type_name: "tf2_msgs/msg/TFMessage"
-#  gz_type_name: "ignition.msgs.Pose_V" 
-##  lazy: true
-#  direction: GZ_TO_ROS
+- ros_topic_name: "/robot_2/pose"
+  gz_topic_name: "/model/robot_2/pose"
+  ros_type_name: "geometry_msgs/msg/PoseStamped"
+  gz_type_name: "ignition.msgs.Pose" 
+#  lazy: true
+  direction: GZ_TO_ROS
 
-- ros_topic_name: "/tf"
-  gz_topic_name: "model/robot_2/pose"
-  ros_type_name: "tf2_msgs/msg/TFMessage"
-  gz_type_name: "gz.msgs.Pose_V"
-  direction: GZ_TO_ROS    
+#- ros_topic_name: "/tf"
+#  gz_topic_name: "model/robot_2/pose"
+#  ros_type_name: "tf2_msgs/msg/TFMessage"
+#  gz_type_name: "gz.msgs.Pose_V"
+#  direction: GZ_TO_ROS    
   
 #    "/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V",
 #    '/imu/data@sensor_msgs/msg/Imu@gz.msgs.IMU',

@@ -3,14 +3,18 @@ conversion_node:
   ros__parameters:
   
     communication:
-      bridge_port: 1235
-      fsw_port: 1235	
-      fsw_ip: "10.5.0.3"
-      telemetry_ip: "0.0.0.0"
-
-      # Phase I helper
-      bridge_ip: "10.5.0.4" # IP of the machine where this bridge is running
-  
+    
+      # FSW information
+      peer_ip: "10.5.0.3"   # IP for fsw
+      peer_port: 2235     # 2234 for single-host (cpu1), 2235 for cpu2
+      peer_processor_id: 2  # Processor id
+      
+      # rosfsw information
+      udp_receive_port: 2236
+      udp_receive_ip: '0.0.0.0'
+      spacecraft_id: 0x42 # 0x42 == 66 
+      processor_id: 3
+      
     command: ['pose_tlm_1'] #, 'pose_tlm_2']
     telemetry: ['twist_cmd_1'] #, 'twist_cmd_2']
 

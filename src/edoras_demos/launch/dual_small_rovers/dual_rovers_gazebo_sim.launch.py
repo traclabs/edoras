@@ -8,8 +8,9 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
-import xacro
+from launch.conditions import IfCondition
 
+import xacro
 
 def generate_launch_description():
 
@@ -43,6 +44,12 @@ def generate_launch_description():
         'world',
         default_value='rocky_surface.sdf',
         description='World file to use in Gazebo')
+
+    declare_rviz = DeclareLaunchArgument(
+        'rviz',
+        default_value='true',
+        description='Start rviz')
+
     
     gz_world_arg = PathJoinSubstitution([
         get_package_share_directory('edoras_demos'), 'worlds', world])
@@ -141,13 +148,15 @@ def generate_launch_description():
          executable="rviz2",
          name="rviz2",
          output="screen",
-         arguments=["-d", rviz_config]
+         arguments=["-d", rviz_config],
+         condition=IfCondition(LaunchConfiguration("rviz"))
     )
     
 
     return LaunchDescription([
       declare_use_sim_time_cmd,
       declare_world_cmd,
+      declare_rviz,
       gz_sim,
       gz_spawn_entity_1,
       gz_spawn_entity_2,

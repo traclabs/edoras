@@ -1,7 +1,7 @@
 /**
- * @file ground_conversion.cpp
+ * @file flight_conversion.cpp
  */
-#include <conversion_tool/ground_conversion.h>
+#include <conversion_tool/flight_conversion.h>
 #include <conversion_tool/parser_utils.h>
 #include <conversion_tool/debug_utils.h>
 
@@ -12,52 +12,64 @@ using namespace std::placeholders;
 typedef const rosidl_message_type_support_t * (* get_message_ts_func)();
 
 /**
- * @function GroundConversion
+ * @function FlightConversion
  * @brief Constructor
  */
-GroundConversion::GroundConversion() :
-rclcpp::Node("ground_conversion",
+FlightConversion::FlightConversion() :
+rclcpp::Node("flight_conversion",
              rclcpp::NodeOptions()
                .allow_undeclared_parameters(true)
                .automatically_declare_parameters_from_overrides(true))
 {
    tlm_rate_ms_ = 100; // Every 100 ms check for new incoming data (10Hz)
+   scanning_rate_ms_ = 500; // Every 500 ms (0.5s)
 }
 
 /**
  * @function parseComm
  */
-bool GroundConversion::parseComm()
+bool FlightConversion::parseComm()
 {
   std::map<std::string, rclcpp::Parameter> comm_params;
 
   if (this->get_parameters("communication", comm_params))
   { 
-      if(comm_params.find("bridge_port") == comm_params.end())
+      if(comm_params.find("peer_ip") == comm_params.end())
         return false;
-      if(comm_params.find("fsw_port") == comm_params.end())
+      if(comm_params.find("peer_port") == comm_params.end())
         return false;
-      if(comm_params.find("fsw_ip") == comm_params.end())
+      if(comm_params.find("peer_spacecraft_id") == comm_params.end())
         return false;
-      if(comm_params.find("telemetry_ip") == comm_params.end())
-        return false;
-      if(comm_params.find("bridge_ip") == comm_params.end())
+      if(comm_params.find("peer_processor_id") == comm_params.end())
         return false;
 
-      own_port_ = comm_params["bridge_port"].as_int();
-      fsw_port_ = comm_params["fsw_port"].as_int();
-      fsw_ip_ = comm_params["fsw_ip"].as_string();
-      telemetry_ip_ = comm_params["telemetry_ip"].as_string();
-      bridge_ip_ = comm_params["bridge_ip"].as_string();
+      if(comm_params.find("udp_receive_port") == comm_params.end())
+        return false;
+      if(comm_params.find("udp_receive_ip") == comm_params.end())
+        return false;
+      if(comm_params.find("spacecraft_id") == comm_params.end())
+        return false;
+      if(comm_params.find("processor_id") == comm_params.end())
+        return false;
 
-      RCLCPP_INFO(this->get_logger(), "** ParseComm: \n * bridge port: %d \n * fsw port: %d \n * fsw_ip: %s  telemetry_ip: %s \n * bridge_ip: %s ", own_port_, fsw_port_, fsw_ip_.c_str(), telemetry_ip_.c_str(), bridge_ip_.c_str());
+      peer_ip_ = comm_params["peer_ip"].as_string();
+      peer_port_ = comm_params["peer_port"].as_int();
+      peer_spacecraft_id_ = comm_params["peer_spacecraft_id"].as_int();
+      peer_processor_id_ = comm_params["peer_processor_id"].as_int();
+      
+      udp_receive_port_ = comm_params["udp_receive_port"].as_int();
+      udp_receive_ip_ = comm_params["udp_receive_ip"].as_string();
+      spacecraft_id_ = comm_params["spacecraft_id"].as_int();
+      processor_id_ = comm_params["processor_id"].as_int();
+
+      RCLCPP_INFO(this->get_logger(), "** ParseComm: \n * peer ip: %s \n * peer port: %d \n * peer processor id: %d \n* peer spacecraft id: %d \n * udp_receive_ip: %s  udp_receive_port: %d \n * spacecraft_id: %d \n * processor_id: %d ", peer_ip_.c_str(), peer_port_, peer_processor_id_, peer_spacecraft_id_, udp_receive_ip_.c_str(), udp_receive_port_, spacecraft_id_, processor_id_);
       return true;
   }
 
   return false;
 }
 
-bool GroundConversion::loadTelemetryInfo( const std::vector<std::string> &_tlm_vals)
+bool FlightConversion::loadTelemetryInfo( const std::vector<std::string> &_tlm_vals)
 {
   for(auto tlm_key : _tlm_vals)
   {
@@ -93,7 +105,7 @@ bool GroundConversion::loadTelemetryInfo( const std::vector<std::string> &_tlm_v
 /**
  * @file loadCommandInfo
  */
-bool GroundConversion::loadCommandInfo( const std::vector<std::string> &_cmd_vals)
+bool FlightConversion::loadCommandInfo( const std::vector<std::string> &_cmd_vals)
 {  
   for(auto cmd_key : _cmd_vals)
   {
@@ -146,7 +158,7 @@ bool GroundConversion::loadCommandInfo( const std::vector<std::string> &_cmd_val
  * @function parseConfigParams
  * @brief Read command and telemetry data
  */
-bool GroundConversion::parseConfigParams()
+bool FlightConversion::parseConfigParams()
 {
   if(!parseComm())
   {
@@ -186,67 +198,51 @@ bool GroundConversion::parseConfigParams()
 /**
  * @function initCommunication
  */
-bool GroundConversion::initCommunication() 
+bool FlightConversion::initCommunication() 
 {
    std::string error_str;
    
    // Initialize communication
-   RCLCPP_INFO(this->get_logger(), "*** Initializing Basic Communication");
-   if(!bc_.initialize( own_port_, fsw_port_, fsw_ip_, telemetry_ip_, error_str))
+   RCLCPP_INFO(this->get_logger(), "*** Initializing Peer Communication");
+   if(!pc_.initialize( udp_receive_port_, udp_receive_ip_, spacecraft_id_, processor_id_, error_str))
    {
-      RCLCPP_INFO(this->get_logger(), "Failed in initializing the Basic Communication module");
+      RCLCPP_INFO(this->get_logger(), "Failed in initializing the Peer Communication module");
       return false;
    }
-   
-   // Set up service
-   srv_to_lab_ = this->create_service<std_srvs::srv::SetBool>("to_lab_enable_output_cmd", std::bind(&GroundConversion::to_lab_enable_output_cmd, this, _1, _2));
-   
+
    // Start communication timer
-   timer_comm_tlm_ = this->create_wall_timer(std::chrono::milliseconds(tlm_rate_ms_), std::bind(&GroundConversion::receiveTelemetry, this));   	
+   timer_sub_scanning_ = this->create_wall_timer(std::chrono::milliseconds(scanning_rate_ms_), 
+                 std::bind(&FlightConversion::subscriptionScanning, this));
+      
+   timer_comm_tlm_ = this->create_wall_timer(std::chrono::milliseconds(tlm_rate_ms_), std::bind(&FlightConversion::receiveTelemetry, this));   	
+
+ 
+   // Add peer (fsw)
+   pc_.addPeer(peer_ip_, peer_port_, peer_spacecraft_id_, peer_processor_id_);
+ 
    
    return true;
 }
 
-/**
- * @function to_lab_enable_output_cmd
- */
-void GroundConversion::to_lab_enable_output_cmd(const std::shared_ptr<std_srvs::srv::SetBool::Request> _req,
-                                                std::shared_ptr<std_srvs::srv::SetBool::Response> _res)
-{ 
-  bool enable = true;
-  _res->success = enableTOLabOutputCmd(enable);
-}
-
-/**
- * @function enableTOLabOutputCmd
- * @brief TODO: Enable/disable. For now, we are only enabling
- */
-bool GroundConversion::enableTOLabOutputCmd(bool _enable)
-{  
-  // 1. Create command to enable TO LAB Output cmd
-  size_t  data_buffer_size = 16;
-  
-  char dest_ip[data_buffer_size];
-  strcpy(dest_ip, bridge_ip_.c_str());
-  uint8_t* data_buffer = (uint8_t*)( &dest_ip[0] );
-  
-  // 2. Sending command to activate telemetry to be sent back
-  // got this info from juicer_config/util/cfe_plugin_config.yaml
-  uint16_t mid = 0x1880; 
-  uint8_t code = 0x06;
-  uint16_t seq = 0;
-  
-  // Send data to cFS
-  RCLCPP_INFO(this->get_logger(), "Send TO LAB Enable output cmd, mid: %02x . Buffer size: %lu", mid, data_buffer_size);
-  return bc_.sendCmdPacket(mid, code, seq, &data_buffer, data_buffer_size);
+/***/
+void FlightConversion::subscriptionScanning()
+{
+   for(auto ti : tlm_info_)
+   {
+      auto info = this->get_subscriptions_info_by_topic(ti.first);
+      if(info.size() > 0)
+        pc_.sendAllSubscriptionMsg(ti.second.mid);
+      else
+        pc_.sendAllUnsubscriptionMsg(ti.second.mid);
+   }
 }
 
 /**
  * @function receiveTelemetry
  */
-void GroundConversion::receiveTelemetry()
+void FlightConversion::receiveTelemetry()
 { 
-  uint16_t mid;
+/*  uint16_t mid;
   std::vector<uint8_t> tlm_header_debug;
   uint8_t* buffer = NULL;  
   size_t buffer_size;
@@ -284,13 +280,13 @@ void GroundConversion::receiveTelemetry()
      
      }   
   }
-
+*/
 }
 
 /**
  * @function getBufferString
  */
-std::string GroundConversion::getBufferString(uint8_t* _buffer, size_t _buffer_size)
+std::string FlightConversion::getBufferString(uint8_t* _buffer, size_t _buffer_size)
 {
    if(_buffer == NULL)
      return std::string("");
@@ -312,7 +308,7 @@ std::string GroundConversion::getBufferString(uint8_t* _buffer, size_t _buffer_s
  * @function hasMid
  * @brief Check whether this mid corresponds to a tlm item indicated in the config yaml file 
  */
-bool GroundConversion::hasMid(const uint16_t &_mid, std::string &_topic)
+bool FlightConversion::hasMid(const uint16_t &_mid, std::string &_topic)
 {
    for(auto ti : tlm_info_)
    {
@@ -330,7 +326,7 @@ bool GroundConversion::hasMid(const uint16_t &_mid, std::string &_topic)
  * @function subscriberCallback
  * @brief Subscribes to ROS topic corresponding to a command to be sent to cFS
  */
-void GroundConversion::subscriberCallback(const std::shared_ptr<const rclcpp::SerializedMessage> _msg, const std::string &_topic_name)
+void FlightConversion::subscriberCallback(const std::shared_ptr<const rclcpp::SerializedMessage> _msg, const std::string &_topic_name)
 {
   if( cmd_info_.find(_topic_name) == cmd_info_.end() )
   {
@@ -355,8 +351,7 @@ void GroundConversion::subscriberCallback(const std::shared_ptr<const rclcpp::Se
   
   // Send data to cFS
   //RCLCPP_INFO(this->get_logger(), "DEBUG: Sending cmd packet, mid: %02x . Buffer size: %lu", mid, data_buffer_size);
-  //RCLCPP_INFO(this->get_logger(), "DEBUG -- Send back to cFS: Subscribed to: %s", _topic_name.c_str());
-  bc_.sendCmdPacket(mid, code, seq, &data_buffer, data_buffer_size);  
+//  bc_.sendCmdPacket(mid, code, seq, &data_buffer, data_buffer_size);  
 }
 
 
@@ -367,7 +362,7 @@ void GroundConversion::subscriberCallback(const std::shared_ptr<const rclcpp::Se
  * added. This is not really needed for our application right now, but I am using it to remember in the future that
  * we can use this additional argument if needed :D.
  */
-bool GroundConversion::addSubscriber(const std::string &_topic_name, const std::string &_message_type)
+bool FlightConversion::addSubscriber(const std::string &_topic_name, const std::string &_message_type)
 {
  
  auto sub = this->create_generic_subscription(_topic_name, _message_type,
@@ -386,7 +381,7 @@ bool GroundConversion::addSubscriber(const std::string &_topic_name, const std::
 /**
  * @function addPublisher
  */
-bool GroundConversion::addPublisher(const std::string &_topic_name, const std::string &_message_type)
+bool FlightConversion::addPublisher(const std::string &_topic_name, const std::string &_message_type)
 {
   auto pub = this->create_generic_publisher(_topic_name, _message_type, rclcpp::QoS(1).transient_local());
   publishers_[_topic_name] = pub;

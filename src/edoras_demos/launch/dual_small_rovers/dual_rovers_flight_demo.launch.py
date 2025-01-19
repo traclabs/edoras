@@ -22,31 +22,51 @@ def generate_launch_description():
     rviz = LaunchConfiguration("rviz")
 
     # Rovers simulation
+    # ros2 topic pub --rate 30 /robot_1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.1, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}"
     sim_rovers = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('edoras_demos'), 'launch', 'dual_small_rovers'),
          '/dual_rovers_gazebo_sim.launch.py']),
-    #  launch_arguments={'ns': 'panda_2/', 'xyz': '1 0 0', 'rpy': '0 0 3.1416'}.items()
+      launch_arguments={'rviz': 'false'}.items()
     )
     
-    # Bridge 1
-    config_1 = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'flight_bridge_1.yaml')
+    # Throttle: msgs_per_sec: 5
+    throttle_flight_pose_1_node = Node(
+        package="topic_tools",
+        executable="throttle",
+        name="throttle_flight_pose_1",
+        output="screen",
+        arguments=["messages", "/robot_1/pose", "5", "/robot_1/throttled_pose"]
+    )     
+    
+    # Throttle: msgs_per_sec: 5
+    throttle_flight_pose_2_node = Node(
+        package="topic_tools",
+        executable="throttle",
+        name="throttle_flight_pose_2",
+        output="screen",
+        arguments=["messages", "/robot_2/pose", "5", "/robot_2/throttled_pose"]
+    )     
+
+    
+    # Edoras Bridge
+    config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'flight_bridge_1.yaml')
+
+    edoras_bridge = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('conversion_tool'), 
+         'launch', 'conversion.launch.py')]),
+      launch_arguments={'config': config}.items()
+    )
   
-    bridge_1 = Node(
-          package='conversion_tool',
-          executable='ground_conversion_node',
-          name='ground_conversion_node',
-          output='screen',
-          ns='robot_1',
-          parameters=[config_1]
-    ) 
 
     ########################
 
     nodes_to_start = [
         sim_rovers,
-        bridge_1,
-        bridge_2
+        throttle_flight_pose_1_node,
+        throttle_flight_pose_2_node,        
+        edoras_bridge
     ]
 
     return LaunchDescription(declared_arguments + nodes_to_start)

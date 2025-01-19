@@ -73,7 +73,7 @@ bool BasicCommunication::sendCmdPacket(const uint16_t &_mid, const uint8_t &_cod
     size_t buffer_length, buffer_capacity;
     memcpy(&buffer_length, cmd_packet + header_ccsds_offset, sizeof(size_t));
     memcpy(&buffer_capacity, cmd_packet + header_ccsds_offset + sizeof(size_t), sizeof(size_t));
-    printf("sendCmdPacket: Packet length: %d Buffer length: %ld -- capacity: %ld ! \n", cmd_packet_size, buffer_length, buffer_capacity); 
+    //printf("sendCmdPacket: Packet length: %d Buffer length: %ld -- capacity: %ld ! \n", cmd_packet_size, buffer_length, buffer_capacity); 
     // DEBUG END -----
     int res = sendto(sock_fd_, cmd_packet, cmd_packet_size, 0, (const struct sockaddr *)&fsw_address_, sizeof(fsw_address_));
     
