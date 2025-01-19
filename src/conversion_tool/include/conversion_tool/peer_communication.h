@@ -23,24 +23,28 @@ class SbnPeer
 	   const int &_spacecraft_id, 
 	   const int &_processor_id);
 
-   std::string udp_ip_;
-   int udp_port_;
-
+   std::string udp_ip;
+   int udp_port;
+   struct sockaddr_in address;
+   
    // Remote
-   int peer_spacecraft_id_;
-   int peer_processor_id_;
+   uint32_t peer_spacecraft_id;
+   uint32_t peer_processor_id;
 
    // Local
-   int spacecraft_id_;
-   int processor_id_;
+   uint32_t spacecraft_id;
+   uint32_t processor_id;
    
-   bool connected_;
-   rclcpp::Time last_heartbeat_rx_;
-   rclcpp::Time last_tx_;
-   double time_period_;
-   
-   
+   bool connected;
+   rclcpp::Time last_heartbeat_rx;
+   rclcpp::Time last_tx;
+   double time_period;
+   std::vector<uint16_t> ros_subscriptions;   
+
+   bool hasRosSubscription(const uint16_t &_mid);
+   void addRosSubscription(const uint16_t &_mid);
 };
+
 
 /**
  * @class PeerCommunication
@@ -49,7 +53,7 @@ class PeerCommunication
 {
  public:
  
- PeerCommunication();
+ PeerCommunication(std::shared_ptr<rclcpp::Node> _node);
  bool initialize(const int &_own_port, 
 		 const std::string &_telemetry_ip,
 		 const int & _spacecraft_id, 
@@ -63,6 +67,10 @@ class PeerCommunication
 	      
  void sendAllSubscriptionMsg(const uint16_t &_mid);
  void sendAllUnsubscriptionMsg(const uint16_t &_mid);
+ 
+ void sendSubscriptionMsg(SbnPeer &_peer, const uint16_t &_mid); 
+ 
+ 
  /*
  bool sendCmdPacket(const uint16_t &_mid, const uint8_t &_code, 
                     const uint16_t &_seq, unsigned char** _data_buffer, 
@@ -76,8 +84,25 @@ class PeerCommunication
  bool find(const int &_peer_spacecraft_id, 
           const int &_peer_processor_id);
 
+ uint8_t*  createSubscriptionMsg(size_t &_msg_size,
+                            const uint8_t &_msg_type,
+                            const uint16_t &_sbn_count, 
+                            const uint16_t &_mid, 
+                            const uint8_t &_sbn_sub_qos_priority,
+                            const uint8_t &_sbn_sub_qos_reliability,
+                            SbnPeer &_peer);
+
+ size_t writeSbnHeader(uint8_t** _msg, 
+                      const uint16_t &_msg_size, 
+                      const uint8_t &_msg_type);
+
+
 //  size_t createCmdPacket(const uint16_t &_mid, const uint8_t &_code, const uint16_t &_seq, 
 //                         const size_t &_data_size, unsigned char** _data_buffer, unsigned char** _cmd_packet);
+
+  bool send(uint8_t* _packet, 
+            const size_t &_packet_size, 
+            SbnPeer &_peer);
 
   int sock_fd_;
   char buffer_[1024];
@@ -88,8 +113,11 @@ class PeerCommunication
   int processor_id_;
   
   // SBN
-  char rev_id_string_[48];
+  static const char* rev_id_string_;
+  static const size_t rev_id_size_;
   
   struct sockaddr_in own_address_;
   std::vector<SbnPeer> peers_; 
+  
+  std::shared_ptr<rclcpp::Node> node_;
 };

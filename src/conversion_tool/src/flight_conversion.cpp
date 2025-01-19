@@ -33,7 +33,7 @@ bool FlightConversion::parseComm()
   std::map<std::string, rclcpp::Parameter> comm_params;
 
   if (this->get_parameters("communication", comm_params))
-  { 
+  { RCLCPP_INFO(this->get_logger(), "DEBUGGING, Got communication");
       if(comm_params.find("peer_ip") == comm_params.end())
         return false;
       if(comm_params.find("peer_port") == comm_params.end())
@@ -62,7 +62,7 @@ bool FlightConversion::parseComm()
       spacecraft_id_ = comm_params["spacecraft_id"].as_int();
       processor_id_ = comm_params["processor_id"].as_int();
 
-      RCLCPP_INFO(this->get_logger(), "** ParseComm: \n * peer ip: %s \n * peer port: %d \n * peer processor id: %d \n* peer spacecraft id: %d \n * udp_receive_ip: %s  udp_receive_port: %d \n * spacecraft_id: %d \n * processor_id: %d ", peer_ip_.c_str(), peer_port_, peer_processor_id_, peer_spacecraft_id_, udp_receive_ip_.c_str(), udp_receive_port_, spacecraft_id_, processor_id_);
+      RCLCPP_INFO(this->get_logger(), "** ParseComm: \n * peer ip: %s \n * peer port: %d \n * peer processor id: %d \n* peer spacecraft id: %d \n * udp_receive_ip: %s \n * udp_receive_port: %d \n * spacecraft_id: %d \n * processor_id: %d ", peer_ip_.c_str(), peer_port_, peer_processor_id_, peer_spacecraft_id_, udp_receive_ip_.c_str(), udp_receive_port_, spacecraft_id_, processor_id_);
       return true;
   }
 
@@ -204,7 +204,8 @@ bool FlightConversion::initCommunication()
    
    // Initialize communication
    RCLCPP_INFO(this->get_logger(), "*** Initializing Peer Communication");
-   if(!pc_.initialize( udp_receive_port_, udp_receive_ip_, spacecraft_id_, processor_id_, error_str))
+   pc_.reset(new PeerCommunication(shared_from_this()));
+   if(!pc_->initialize( udp_receive_port_, udp_receive_ip_, spacecraft_id_, processor_id_, error_str))
    {
       RCLCPP_INFO(this->get_logger(), "Failed in initializing the Peer Communication module");
       return false;
@@ -218,9 +219,10 @@ bool FlightConversion::initCommunication()
 
  
    // Add peer (fsw)
-   pc_.addPeer(peer_ip_, peer_port_, peer_spacecraft_id_, peer_processor_id_);
+   RCLCPP_INFO(this->get_logger(), "*** Adding Peer");
+   if(!pc_->addPeer(peer_ip_, peer_port_, peer_spacecraft_id_, peer_processor_id_))
+     return false;
  
-   
    return true;
 }
 
@@ -231,9 +233,9 @@ void FlightConversion::subscriptionScanning()
    {
       auto info = this->get_subscriptions_info_by_topic(ti.first);
       if(info.size() > 0)
-        pc_.sendAllSubscriptionMsg(ti.second.mid);
+        pc_->sendAllSubscriptionMsg(ti.second.mid);
       else
-        pc_.sendAllUnsubscriptionMsg(ti.second.mid);
+        pc_->sendAllUnsubscriptionMsg(ti.second.mid);
    }
 }
 

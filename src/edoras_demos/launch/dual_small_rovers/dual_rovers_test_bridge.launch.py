@@ -63,10 +63,10 @@ def generate_launch_description():
     ########################
 
     nodes_to_start = [
-        sim_rovers,
-        throttle_flight_pose_1_node,
-        throttle_flight_pose_2_node,        
-        #edoras_bridge
+        #sim_rovers,
+        #throttle_flight_pose_1_node,
+        #throttle_flight_pose_2_node,        
+        edoras_bridge
     ]
 
     return LaunchDescription(declared_arguments + nodes_to_start)

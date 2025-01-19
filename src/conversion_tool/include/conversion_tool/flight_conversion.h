@@ -74,12 +74,12 @@ protected:
   int peer_processor_id_;
 
   // Communication
-  PeerCommunication pc_; 
+  std::shared_ptr<PeerCommunication> pc_; 
 
   rclcpp::TimerBase::SharedPtr timer_sub_scanning_;  
   rclcpp::TimerBase::SharedPtr timer_comm_tlm_;
   int tlm_rate_ms_;
-  double scanning_rate_ms_;
+  int scanning_rate_ms_;
   
   //
   std::map<std::string, CmdInfo_t> cmd_info_;
