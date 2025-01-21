@@ -66,7 +66,7 @@ def generate_launch_description():
         sim_rovers,
         throttle_flight_pose_1_node,
         throttle_flight_pose_2_node,        
-        #edoras_bridge
+        edoras_bridge
     ]
 
     return LaunchDescription(declared_arguments + nodes_to_start)

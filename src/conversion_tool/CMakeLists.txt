@@ -47,6 +47,8 @@ target_link_libraries(ground_conversion basic_communication)
 add_library(flight_conversion SHARED 
             src/flight_conversion.cpp
             src/peer_communication.cpp
+            src/sbn_peer.cpp
+            src/memory_utils.cpp
             src/parser_utils.cpp
             src/debug_utils.cpp)
 ament_target_dependencies(flight_conversion

@@ -4,6 +4,7 @@
 #include <conversion_tool/ground_conversion.h>
 #include <conversion_tool/parser_utils.h>
 #include <conversion_tool/debug_utils.h>
+#include <conversion_tool/memory_utils.h>
 
 #include <dlfcn.h>
 
@@ -269,15 +270,12 @@ void GroundConversion::receiveTelemetry()
          
          // Publish data
          rcutils_uint8_array_t* serialized_array = nullptr;
-         RCLCPP_INFO(this->get_logger(), "Make serialized array");
          serialized_array = make_serialized_array(buffer);
-         RCLCPP_INFO(this->get_logger(), "Publishing before ");
          rclcpp::SerializedMessage serialized_msg(*serialized_array);
-                  RCLCPP_INFO(this->get_logger(), "Publishing after ");
          publishers_[topic_name]->publish(serialized_msg);
-                  RCLCPP_INFO(this->get_logger(), "Cleanup ");
+         
          // Clean up
-         free(buffer);         RCLCPP_INFO(this->get_logger(), "Fini ");
+         free(buffer);
          rmw_ret_t res = rcutils_uint8_array_fini(serialized_array);
          if(res != RCUTILS_RET_OK)
            RCLCPP_ERROR(this->get_logger(), "releasing resources from serialized_array used to publish  tlm!");  
@@ -285,27 +283,6 @@ void GroundConversion::receiveTelemetry()
      }   
   }
 
-}
-
-/**
- * @function getBufferString
- */
-std::string GroundConversion::getBufferString(uint8_t* _buffer, size_t _buffer_size)
-{
-   if(_buffer == NULL)
-     return std::string("");
-     
-   std::string s = "";
-   for(size_t i = 0; i < _buffer_size; i++)
-   {   
-      char bi[10];
-      sprintf(bi, "%02x", *(_buffer + i) );
-      s = s +  " " + bi;
-      if(i % 8 == 7 )
-        s = s + "\n";
-   }
-
-   return s;
 }
 
 /**

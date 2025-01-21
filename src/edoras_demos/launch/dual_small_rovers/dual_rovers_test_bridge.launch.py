@@ -48,6 +48,15 @@ def generate_launch_description():
         arguments=["messages", "/robot_2/pose", "5", "/robot_2/throttled_pose"]
     )     
 
+
+    # TEST
+    test_node = Node(
+        package="topic_tools",
+        executable="throttle",
+        name="throttle_flight_pose_2",
+        output="screen",
+        arguments=["messages", "/robot_1/cmd_vel", "5", "/robot_1/throttled_cmd_vel"]
+    ) 
     
     # Edoras Bridge
     config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'flight_bridge.yaml')
@@ -65,7 +74,8 @@ def generate_launch_description():
     nodes_to_start = [
         #sim_rovers,
         #throttle_flight_pose_1_node,
-        #throttle_flight_pose_2_node,        
+        #throttle_flight_pose_2_node,
+        test_node,
         edoras_bridge
     ]
 

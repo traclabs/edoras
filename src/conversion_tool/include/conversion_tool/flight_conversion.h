@@ -64,14 +64,14 @@ protected:
   // Params
   int udp_receive_port_;
   std::string udp_receive_ip_;
-  int spacecraft_id_;
-  int processor_id_;
+  uint32_t spacecraft_id_;
+  uint32_t processor_id_;
 
   // Params fsw
   std::string peer_ip_;
   int peer_port_;
-  int peer_spacecraft_id_;  
-  int peer_processor_id_;
+  uint32_t peer_spacecraft_id_;  
+  uint32_t peer_processor_id_;
 
   // Communication
   std::shared_ptr<PeerCommunication> pc_; 

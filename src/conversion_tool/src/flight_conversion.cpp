@@ -21,7 +21,7 @@ rclcpp::Node("flight_conversion",
                .allow_undeclared_parameters(true)
                .automatically_declare_parameters_from_overrides(true))
 {
-   tlm_rate_ms_ = 100; // Every 100 ms check for new incoming data (10Hz)
+   tlm_rate_ms_ = 100; // Every 100 ms check for new incoming data (10Hz) - sbn_receiver.py
    scanning_rate_ms_ = 500; // Every 500 ms (0.5s)
 }
 
@@ -219,14 +219,16 @@ bool FlightConversion::initCommunication()
 
  
    // Add peer (fsw)
-   RCLCPP_INFO(this->get_logger(), "*** Adding Peer");
+   RCLCPP_INFO(this->get_logger(), "*** Adding Peer: sc id : %d processor id: %d", peer_spacecraft_id_, peer_processor_id_);
    if(!pc_->addPeer(peer_ip_, peer_port_, peer_spacecraft_id_, peer_processor_id_))
      return false;
  
    return true;
 }
 
-/***/
+/**
+ * @function subscriptionScanning
+ */
 void FlightConversion::subscriptionScanning()
 {
    for(auto ti : tlm_info_)
@@ -244,19 +246,19 @@ void FlightConversion::subscriptionScanning()
  */
 void FlightConversion::receiveTelemetry()
 { 
-/*  uint16_t mid;
+  uint16_t mid;
   std::vector<uint8_t> tlm_header_debug;
   uint8_t* buffer = NULL;  
   size_t buffer_size;
 
-  if( bc_.receiveTlmPacket(mid, &buffer, tlm_header_debug, buffer_size))
-  {
+  if( pc_->receiveTlmPacket(mid, &buffer))
+  { RCLCPP_INFO(this->get_logger(), "Received telemetry packet, it seems!");
      // Check if this telemetry's mid is one our application cares to hear
      std::string topic_name;
      if( hasMid(mid, topic_name) )
      {  
         // DEBUG
-        RCLCPP_INFO(this->get_logger(), "Mid received (%04x) corresponds to topic: %s . Buffer size: %lu", mid, topic_name.c_str(), buffer_size);
+        RCLCPP_INFO(this->get_logger(), "Mid received (%04x) corresponds to topic: %s .", mid, topic_name.c_str());
         //RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
         // tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
         // tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
@@ -267,22 +269,19 @@ void FlightConversion::receiveTelemetry()
          
          // Publish data
          rcutils_uint8_array_t* serialized_array = nullptr;
-         RCLCPP_INFO(this->get_logger(), "Make serialized array");
          serialized_array = make_serialized_array(buffer);
-         RCLCPP_INFO(this->get_logger(), "Publishing before ");
          rclcpp::SerializedMessage serialized_msg(*serialized_array);
-                  RCLCPP_INFO(this->get_logger(), "Publishing after ");
          publishers_[topic_name]->publish(serialized_msg);
-                  RCLCPP_INFO(this->get_logger(), "Cleanup ");
+         
          // Clean up
-         free(buffer);         RCLCPP_INFO(this->get_logger(), "Fini ");
+         free(buffer);
          rmw_ret_t res = rcutils_uint8_array_fini(serialized_array);
          if(res != RCUTILS_RET_OK)
-           RCLCPP_ERROR(this->get_logger(), "releasing resources from serialized_array used to publish  tlm!");  
+           RCLCPP_ERROR(this->get_logger(), "releasing resources from serialized_array used to publish  tlm!");
      
-     }   
+     } // hasMid   
   }
-*/
+
 }
 
 /**
