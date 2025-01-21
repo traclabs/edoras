@@ -12,7 +12,9 @@
 const char*  PeerCommunication::rev_id_string_ = "$Id: dccf6239093d99c4c9351e140c15b61a95d8fc37 $";
 const size_t PeerCommunication::rev_id_size_ = 48;
 const size_t PeerCommunication::EDORAS_SBN_HDR_SIZE = 11;
-const size_t PeerCommunication::EDORAS_TLM_HDR_SIZE = 16; // // tlm header: 8 primary + 4 secondary + 4 padding
+const size_t PeerCommunication::EDORAS_CFE_TLM_HDR_SIZE = 16; // // tlm header: 8 primary + 4 secondary + 4 padding
+const size_t PeerCommunication::EDORAS_CFE_CMD_HDR_SIZE = 8;
+
 /**
  * @function PeerCommunication
  * @brief Constructor
@@ -132,14 +134,16 @@ void PeerCommunication::sendAllSubscriptionMsg(const uint16_t &_mid)
 
 void PeerCommunication::sendAllUnsubscriptionMsg(const uint16_t &_mid)
 {
-
+   for(auto pe : peers_)
+   {
+      if( pe.hasRosSubscription(_mid) )
+      {
+         pe.deleteRosSubscription(_mid);
+         this->sendUnsubscriptionMsg(&pe, _mid);
+      }
+   }
 }
 
-
-
-
-
-  
 /**
  * @function receiveTlmPacket
  * @brief Received buffer has:
@@ -223,7 +227,7 @@ int PeerCommunication::handleSbnMsg(uint8_t* _buf, const ssize_t &_buf_size,
       
       // SBN CFE message transfer
       case 3:
-      processCfeTlmMessage(_buf, peer, _buf_size, _mid, _buffer_tlm);
+      processCfeTlmMessage(_buf, _buf_size, _mid, _buffer_tlm);
       break;
 
       // SBN Protocol message      
@@ -298,7 +302,7 @@ void PeerCommunication::processSbnProtocolMsg(uint8_t *_buf)
  * @function processCfeTlmMesage
  * @brief Packet consists of SBN_HDR + TLM_HDR (16-byte header) + data (buffer_length + buffer_capacity + serialized)
  */
-bool PeerCommunication::processCfeTlmMessage(uint8_t *_buf, SbnPeer* _peer, const ssize_t &_buf_size, 
+bool PeerCommunication::processCfeTlmMessage(uint8_t *_buf, const ssize_t &_buf_size, 
                                              uint16_t &_mid, uint8_t** _buffer_tlm)
 {
    // Get mid: First 2 bytes
@@ -306,7 +310,7 @@ bool PeerCommunication::processCfeTlmMessage(uint8_t *_buf, SbnPeer* _peer, cons
    _mid = ((uint16_t)_buf[offset] << 8) | _buf[offset + 1];
    
    // Get message data
-   offset += EDORAS_TLM_HDR_SIZE;
+   offset += EDORAS_CFE_TLM_HDR_SIZE;
 
    size_t buffer_tlm_size = (size_t) _buf_size - offset;
    *_buffer_tlm = static_cast<uint8_t *>( malloc(buffer_tlm_size) );
@@ -392,7 +396,91 @@ size_t PeerCommunication::readSbnHeader(uint8_t* _buf,
                _msg_size, _msg_type, _processor_id, _spacecraft_id, _buf_size);
    
    return offset;
-}                   
+}
+
+/** 
+ * @function send
+ */
+bool PeerCommunication::send(const uint16_t &mid, 
+                 uint8_t** _data_buffer, 
+                 const size_t &_data_size)
+{ 
+   for(auto pi : peers_)
+      this->sendCfeMsgIfSubscribed(&pi, mid, _data_buffer, _data_size);
+   return true;
+}
+
+/**
+ * @function sendCfeMsgIfSubscribed
+ */
+bool PeerCommunication::sendCfeMsgIfSubscribed(SbnPeer* _peer, 
+                            const uint16_t &_mid,
+                            uint8_t** _data_buffer,
+                            const size_t &_data_size)
+{
+   if( _peer->hasSubscription(_mid) )
+     return sendCfeMsg(_peer, _mid, _data_buffer, _data_size);
+     
+   return false;
+}        
+
+/**
+ * @function sendCfeMsg
+ */
+bool PeerCommunication::sendCfeMsg(SbnPeer* _peer,
+                           const uint16_t &_mid, 
+                           uint8_t** _data_buffer, 
+                           const size_t &_data_size)
+{
+   size_t msg_size_minus_header = EDORAS_CFE_CMD_HDR_SIZE + _data_size;
+   size_t msg_size = EDORAS_SBN_HDR_SIZE + msg_size_minus_header;
+   uint8_t msg_type = 3; // SEND MSG TO BUS!
+
+   uint8_t* cfe_msg = nullptr;
+   cfe_msg = static_cast<uint8_t *>( malloc(msg_size) );
+
+   size_t offset = 0;
+   size_t sz;
+   
+   sz = writeSbnHeader(&cfe_msg, msg_size_minus_header, msg_type);
+   offset += sz;
+    
+   sz = writeCmdPacket(cfe_msg + offset, _mid, _data_buffer, _data_size);
+   offset += sz;
+   
+   bool res = this->_send(cfe_msg, msg_size, _peer);
+
+   // Cleanup
+   free(cfe_msg);
+   
+   return res;
+}
+
+/**
+ * @function sendSubscriptionMsg
+ * @brief Send subscription request to this peer
+ */
+bool PeerCommunication::sendUnsubscriptionMsg(SbnPeer* _peer, 
+                                              const uint16_t &_mid)
+{  
+  size_t msg_size;
+  uint8_t msg_type = 2; // UNSUBSCRIBE!
+  uint8_t sbn_sub_qos_priority = 0;
+  uint8_t sbn_sub_qos_reliability = 0;
+  std::vector<uint16_t> mids;
+  mids.push_back(_mid);
+    
+  uint8_t* unsub_msg = NULL;
+  unsub_msg = createSubscriptionMsg(msg_size, msg_type, mids,
+             sbn_sub_qos_priority, sbn_sub_qos_reliability);
+             
+   bool res = this->_send(unsub_msg, msg_size, _peer);
+   
+   // Cleanup
+   free(unsub_msg);
+   
+   return res;
+}
 
 
 
@@ -416,7 +504,7 @@ bool PeerCommunication::sendSubscriptionMsg(SbnPeer *_peer,
                                             const std::vector<uint16_t> &_mids)
 {
    size_t msg_size;
-   uint8_t msg_type = 1;
+   uint8_t msg_type = 1; // SUBSCRIBE!
    uint8_t sbn_sub_qos_priority = 0;
    uint8_t sbn_sub_qos_reliability = 0;
    
@@ -424,7 +512,7 @@ bool PeerCommunication::sendSubscriptionMsg(SbnPeer *_peer,
    sub_msg = createSubscriptionMsg(msg_size, msg_type, _mids,
              sbn_sub_qos_priority, sbn_sub_qos_reliability);
              
-   bool res = this->send(sub_msg, msg_size, _peer);
+   bool res = this->_send(sub_msg, msg_size, _peer);
    
    // Cleanup
    free(sub_msg);
@@ -454,7 +542,7 @@ bool PeerCommunication::sendProtocolMsg(SbnPeer* _peer)
    sz = memcpy_lb_uint8(&protocol_msg, offset, protocol_id);
    offset += sz;
 
-   bool res = this->send(protocol_msg, msg_size, _peer);
+   bool res = this->_send(protocol_msg, msg_size, _peer);
    
    // Cleanup
    free(protocol_msg);
@@ -476,7 +564,7 @@ bool PeerCommunication::sendHeartbeat(SbnPeer* _peer)
 
    writeSbnHeader(&heartbeat_msg, (uint16_t)msg_size_minus_header, msg_type);
    
-   bool res = this->send(heartbeat_msg, msg_size, _peer);
+   bool res = this->_send(heartbeat_msg, msg_size, _peer);
    
    // Cleanup
    free(heartbeat_msg);
@@ -488,7 +576,7 @@ bool PeerCommunication::sendHeartbeat(SbnPeer* _peer)
 /**
  * @function send
  */
-bool PeerCommunication::send(uint8_t* _packet, 
+bool PeerCommunication::_send(uint8_t* _packet, 
                              const size_t &_packet_size, 
                              SbnPeer* _peer)
 {
@@ -588,43 +676,14 @@ size_t PeerCommunication::writeSbnHeader(uint8_t** _msg,
    return offset;
 }
 
- 
-/**
- * @function sendCmdPacket
- */
- /*
-bool PeerCommunication::sendCmdPacket(const uint16_t &_mid, const uint8_t &_code, 
-                                       const uint16_t &_seq, unsigned char** _data_buffer, 
-                                       const size_t &_data_size)
-{   
-    //size_t         bufSize = serialize(_js, &buf);
-    size_t header_ccsds_offset = 8;
-    unsigned char* cmd_packet = new unsigned char[_data_size + header_ccsds_offset];
-    size_t cmd_packet_size;
-    cmd_packet_size = createCmdPacket(_mid, _code, _seq, _data_size, _data_buffer, &cmd_packet);
-    
-    //  Read data from cmd packet
-    // DEBUG START----
-    size_t buffer_length, buffer_capacity;
-    memcpy(&buffer_length, cmd_packet + header_ccsds_offset, sizeof(size_t));
-    memcpy(&buffer_capacity, cmd_packet + header_ccsds_offset + sizeof(size_t), sizeof(size_t));
-    //printf("sendCmdPacket: Packet length: %d Buffer length: %ld -- capacity: %ld ! \n", cmd_packet_size, buffer_length, buffer_capacity); 
-    // DEBUG END -----
-    int res = sendto(sock_fd_, cmd_packet, cmd_packet_size, 0, (const struct sockaddr *)&fsw_address_, sizeof(fsw_address_));
-    
-    if(res < 0)
-      return false;
-
-    return true;
-}*/
-
 /**
  * @function createCmdPacket
  * @brief Add command header on top of data buffer and return it
  */
- /*
-size_t PeerCommunication::createCmdPacket(const uint16_t &_mid, const uint8_t &_code, const uint16_t &_seq, 
-                                           const size_t &_data_size, unsigned char** _data_buffer, unsigned char** _cmd_packet)
+size_t PeerCommunication::writeCmdPacket(uint8_t* _cmd_packet,
+                                         const uint16_t &_mid, 
+                                         uint8_t** _data_buffer,
+                                         const size_t &_data_size)
 {
    // Header contains
    // 2 bytes: stream_id
@@ -633,34 +692,35 @@ size_t PeerCommunication::createCmdPacket(const uint16_t &_mid, const uint8_t &_
    // 1 bytes: code
    // 1 bytes: checksum
    // 2 + 2 + 2 + 1 + 1 = 8 bytes
-   const uint8_t header_size = 8;
-   uint16_t packet_length = header_size + _data_size;
+   uint16_t packet_length = (uint16_t) EDORAS_CFE_CMD_HDR_SIZE + _data_size;
    uint16_t packet_length_ccsds_offset = packet_length - 7;
+   uint8_t code = 0x01;
+   uint16_t seq = 0;
+
    
-   unsigned char  cmd_header[header_size];
+   uint8_t cmd_header[EDORAS_CFE_CMD_HDR_SIZE];
 
    cmd_header[0] = (_mid >> 8) & 0xFF;
    cmd_header[1] = _mid & 0xFF;
-   cmd_header[2] = (_seq >> 8) & 0xFF;
-   cmd_header[3] = _seq & 0xFF;
+   cmd_header[2] = (seq >> 8) & 0xFF;
+   cmd_header[3] = seq & 0xFF;
    cmd_header[4] = (packet_length_ccsds_offset >> 8) & 0xFF;
    cmd_header[5] = packet_length_ccsds_offset & 0xFF;
-   cmd_header[6] = _code;
+   cmd_header[6] = code;
    cmd_header[7] = 0;
    
-   // DEBUG
-   //printf("BC: createCmdPacket: Header: ");
-   // for (uint8_t i = 0; i < header_size; i++) {
-  //      printf("%02x ", cmd_header[i]);
-   // } printf("\n");
-
    // Add header bytes on top of the serialized data
    size_t offset = 0;
   
-   memcpy(*_cmd_packet + offset, &cmd_header, sizeof(cmd_header));  offset += sizeof(cmd_header);
-   memcpy(*_cmd_packet + offset, *_data_buffer, _data_size);
+   memcpy(_cmd_packet + offset, &cmd_header, sizeof(cmd_header));  
+   offset += sizeof(cmd_header);
+   
+   memcpy(_cmd_packet + offset, *_data_buffer, _data_size);
+   offset += _data_size;
+   
+   if(offset != packet_length)
+     RCLCPP_ERROR(node_->get_logger(), "Offset should be same as packet length: %lu and %d", offset, packet_length);
    
   return packet_length;
-}*/
-
+}
 

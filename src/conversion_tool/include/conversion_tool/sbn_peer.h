@@ -37,8 +37,9 @@ class SbnPeer
    bool setConnected( const rclcpp::Time &_now);
    
    bool hasRosSubscription(const uint16_t &_mid);
-   void addRosSubscription(const uint16_t &_mid);
-   
+   size_t addRosSubscription(const uint16_t &_mid);
+   size_t deleteRosSubscription(const uint16_t &_mid);
+      
    bool hasSubscription(const uint16_t &_mid);   
    size_t addSubscriptions(const std::vector<SubscriptionData> &_subscriptions);
    size_t deleteSubscriptions(const std::vector<SubscriptionData> &_subscriptions);

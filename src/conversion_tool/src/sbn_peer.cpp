@@ -52,10 +52,34 @@ bool SbnPeer::hasRosSubscription(const uint16_t &_mid)
    return false;
 }
 
-void SbnPeer::addRosSubscription(const uint16_t &_mid)
+size_t SbnPeer::addRosSubscription(const uint16_t &_mid)
 {
    this->ros_subscriptions.push_back(_mid);
+   
+   return this->ros_subscriptions.size();
 }
+
+/**
+ * @function deleteSubscription
+ */
+size_t SbnPeer::deleteRosSubscription(const uint16_t &_mid)
+{
+   int idx = -1;
+   for(int i = 0; i < this->ros_subscriptions.size(); ++i)
+   {
+      if(_mid == this->ros_subscriptions[i])
+      {
+         idx = i; 
+         break;
+      }
+   }
+      
+   if(idx != -1)
+     this->ros_subscriptions.erase(this->ros_subscriptions.begin() + idx);      
+   
+   return this->ros_subscriptions.size();
+}
+
 
 bool SbnPeer::hasSubscription(const uint16_t &_mid)
 {

@@ -33,13 +33,9 @@ class PeerCommunication
 	      
  void sendAllSubscriptionMsg(const uint16_t &_mid);
  void sendAllUnsubscriptionMsg(const uint16_t &_mid);
- 
-  
- /*
- bool sendCmdPacket(const uint16_t &_mid, const uint8_t &_code, 
-                    const uint16_t &_seq, unsigned char** _data_buffer, 
-                    const size_t &_data_size); */
+   
  bool receiveTlmPacket(uint16_t &_mid, uint8_t** _buffer);
+ bool send(const uint16_t &mid, uint8_t** _data_buffer, const size_t &_data_size); // sendCommand
 
  protected:
  
@@ -66,19 +62,18 @@ class PeerCommunication
   void processSbnUnsubscriptionMsg(uint8_t *_buf, SbnPeer* _peer);
   void processSbnProtocolMsg(uint8_t *_buf);
   void parseSbnSubMsg(uint8_t* _buf, std::vector<SubscriptionData> &_subscriptions);
-  bool processCfeTlmMessage(uint8_t *_buf, SbnPeer* _peer, const ssize_t &_buf_size, 
+  bool processCfeTlmMessage(uint8_t *_buf, const ssize_t &_buf_size, 
                             uint16_t &_mid, uint8_t** _buffer_tlm);
-//  size_t createCmdPacket(const uint16_t &_mid, const uint8_t &_code, const uint16_t &_seq, 
-//                         const size_t &_data_size, unsigned char** _data_buffer, unsigned char** _cmd_packet);
 
   private:
   
   bool sendSubscriptionMsg(SbnPeer* _peer, const uint16_t &_mid);
-  bool sendSubscriptionMsg(SbnPeer* _peer, const std::vector<uint16_t> &_mid); 
+  bool sendSubscriptionMsg(SbnPeer* _peer, const std::vector<uint16_t> &_mid);
+  bool sendUnsubscriptionMsg(SbnPeer* _peer, const uint16_t &_mid); 
   bool sendProtocolMsg(SbnPeer* _peer);
   bool sendHeartbeat(SbnPeer* _peer);
   
-  bool send(uint8_t* _packet, 
+  bool _send(uint8_t* _packet, 
             const size_t &_packet_size, 
             SbnPeer* _peer);
 
@@ -88,11 +83,24 @@ class PeerCommunication
                              const std::vector<uint16_t> &_mids, 
                              const uint8_t &_sbn_sub_qos_priority,
                              const uint8_t &_sbn_sub_qos_reliability);
- size_t writeSbnHeader(uint8_t** _msg, 
-                      const uint16_t &_msg_size, 
-                      const uint8_t &_msg_type);
+  size_t writeSbnHeader(uint8_t** _msg, 
+                        const uint16_t &_msg_size, 
+                        const uint8_t &_msg_type);
 
+  size_t writeCmdPacket(uint8_t* _cmd_packet,
+                        const uint16_t &_mid, 
+                        uint8_t** _data_buffer,
+                        const size_t &_data_size);
 
+  bool sendCfeMsgIfSubscribed(SbnPeer* _peer, 
+                              const uint16_t &_mid,
+                              uint8_t** _data_buffer,
+                              const size_t &_data_size);
+  bool sendCfeMsg(SbnPeer* _peer,
+                  const uint16_t &_mid, 
+                  uint8_t** _data_buffer, 
+                  const size_t &_data_size);
+                
   protected:
   int sock_fd_;
   char buffer_[1024];
@@ -106,7 +114,8 @@ class PeerCommunication
   static const char* rev_id_string_;
   static const size_t rev_id_size_;
   static const size_t EDORAS_SBN_HDR_SIZE;
-  static const size_t EDORAS_TLM_HDR_SIZE;
+  static const size_t EDORAS_CFE_TLM_HDR_SIZE;
+  static const size_t EDORAS_CFE_CMD_HDR_SIZE;
   
   struct sockaddr_in own_address_;
   std::vector<SbnPeer> peers_; 

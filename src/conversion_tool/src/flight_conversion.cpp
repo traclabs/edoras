@@ -249,7 +249,6 @@ void FlightConversion::receiveTelemetry()
   uint16_t mid;
   std::vector<uint8_t> tlm_header_debug;
   uint8_t* buffer = NULL;  
-  size_t buffer_size;
 
   if( pc_->receiveTlmPacket(mid, &buffer))
   { RCLCPP_INFO(this->get_logger(), "Received telemetry packet, it seems!");
@@ -259,9 +258,6 @@ void FlightConversion::receiveTelemetry()
      {  
         // DEBUG
         RCLCPP_INFO(this->get_logger(), "Mid received (%04x) corresponds to topic: %s .", mid, topic_name.c_str());
-        //RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
-        // tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
-        // tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
 
          // Debug
          //std::string s = getBufferString(buffer, buffer_size);                   
@@ -347,12 +343,11 @@ void FlightConversion::subscriberCallback(const std::shared_ptr<const rclcpp::Se
   //debug_parse_message(data_buffer, cmd_info_[_topic_name].type_info);
    
   uint16_t mid = cmd_info_[_topic_name].mid;
-  uint8_t code = 0x01;
-  uint16_t seq = 0;
   
   // Send data to cFS
   //RCLCPP_INFO(this->get_logger(), "DEBUG: Sending cmd packet, mid: %02x . Buffer size: %lu", mid, data_buffer_size);
-//  bc_.sendCmdPacket(mid, code, seq, &data_buffer, data_buffer_size);  
+  pc_->send(mid, &data_buffer, data_buffer_size);
+
 }
 
 
