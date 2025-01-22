@@ -40,7 +40,7 @@ bool ArmCommUdp::initRobotComm()
 
   sub_js_ = this->create_subscription<sensor_msgs::msg::JointState>(js_topic, 10, std::bind(&ArmCommUdp::js_cb, this, _1));
   pub_jc_ = this->create_publisher<sensor_msgs::msg::JointState>(jc_topic, 10);
-
+ 
   trac_ik_.reset( new TRAC_IK::TRAC_IK(shared_from_this(), base_link_, tip_link_, 
                    robot_description_, max_time_, eps_, solve_type_) );
 

@@ -1,4 +1,4 @@
-ground_conversion_node:
+conversion_node:
 
   ros__parameters:
   
@@ -17,9 +17,9 @@ ground_conversion_node:
     cmd_twist:
       type: "geometry_msgs/msg/Twist"
       topic: "cmd_vel"
-      mid: 0x1827 # GATEWAY_APP_CMD_MID 
+      mid: 0x1827 # EDORAS_APP_CMD_MID 
 
     tlm_pose:
       type: "geometry_msgs/msg/PoseStamped"
       topic: "telemetry_pose"
-      mid: 0x827 # GATEWAY_APP_TLM_MID
+      mid: 0x827 # EDORAS_APP_TLM_MID

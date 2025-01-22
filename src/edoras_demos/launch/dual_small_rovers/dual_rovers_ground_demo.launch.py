@@ -25,13 +25,22 @@ def generate_launch_description():
   rviz = LaunchConfiguration("rviz")
   
   # Send commands
-  steering_node_1 = Node(
+  steering_1 = Node(
           package='rqt_robot_steering',
           executable='rqt_robot_steering',
-          name='send_robot_steering',
+          name='steering_1',
           output='screen',
-          namespace='robot_1_ground'
+          namespace='robot_1/ground'
           )
+
+  steering_2 = Node(
+          package='rqt_robot_steering',
+          executable='rqt_robot_steering',
+          name='steering_2',
+          output='screen',
+          namespace='robot_2/ground'
+          )          
+          
   # View telemetry back
   rviz_config_file = PathJoinSubstitution(
         [FindPackageShare("edoras_demos"), "rviz", "dual_small_rovers_ground_demo.rviz"]
@@ -67,7 +76,7 @@ def generate_launch_description():
 
 
   # Edoras Bridge
-  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'ground_bridge.yaml')
+  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'ground_bridge_multihost.yaml')
 
   edoras_bridge = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
@@ -77,9 +86,10 @@ def generate_launch_description():
   )
 
   ld = LaunchDescription(ARGUMENTS)
-  ld.add_action(steering_node_1)
-  ld.add_action(throttle_ground_twist_1_node)
-  ld.add_action(throttle_ground_twist_2_node)  
+  ld.add_action(steering_1)
+  ld.add_action(steering_2)
+  #ld.add_action(throttle_ground_twist_1_node)
+  #ld.add_action(throttle_ground_twist_2_node)  
   ld.add_action(rviz_node)
   ld.add_action(edoras_bridge)
   return ld

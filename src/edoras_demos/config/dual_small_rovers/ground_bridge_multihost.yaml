@@ -4,12 +4,12 @@ conversion_node:
   
     communication:
       bridge_port: 1235
-      fsw_port: 1234
-      fsw_ip: "127.0.0.1"
+      fsw_port: 1235	
+      fsw_ip: "10.5.0.3"
       telemetry_ip: "0.0.0.0"
 
       # Phase I helper
-      bridge_ip: "127.0.0.1" # IP of the machine where this bridge is running
+      bridge_ip: "10.5.0.2" # IP of the machine where this bridge is running
   
     command: ['twist_cmd_1', 'twist_cmd_2']
     telemetry: ['pose_tlm_1', 'pose_tlm_2']

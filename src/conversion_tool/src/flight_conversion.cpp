@@ -33,7 +33,7 @@ bool FlightConversion::parseComm()
   std::map<std::string, rclcpp::Parameter> comm_params;
 
   if (this->get_parameters("communication", comm_params))
-  { RCLCPP_INFO(this->get_logger(), "DEBUGGING, Got communication");
+  {
       if(comm_params.find("peer_ip") == comm_params.end())
         return false;
       if(comm_params.find("peer_port") == comm_params.end())
@@ -251,18 +251,13 @@ void FlightConversion::receiveTelemetry()
   uint8_t* buffer = NULL;  
 
   if( pc_->receiveTlmPacket(mid, &buffer))
-  { RCLCPP_INFO(this->get_logger(), "Received telemetry packet, it seems!");
+  {
      // Check if this telemetry's mid is one our application cares to hear
      std::string topic_name;
      if( hasMid(mid, topic_name) )
      {  
-        // DEBUG
-        RCLCPP_INFO(this->get_logger(), "Mid received (%04x) corresponds to topic: %s .", mid, topic_name.c_str());
+        RCLCPP_DEBUG(this->get_logger(), "Mid received (%04x) corresponds to topic: %s .", mid, topic_name.c_str());
 
-         // Debug
-         //std::string s = getBufferString(buffer, buffer_size);                   
-         //RCLCPP_INFO(this->get_logger(), "** Tlm buffer received (%ld): \n %s ", buffer_size, s.c_str());        
-         
          // Publish data
          rcutils_uint8_array_t* serialized_array = nullptr;
          serialized_array = make_serialized_array(buffer);
@@ -345,7 +340,6 @@ void FlightConversion::subscriberCallback(const std::shared_ptr<const rclcpp::Se
   uint16_t mid = cmd_info_[_topic_name].mid;
   
   // Send data to cFS
-  //RCLCPP_INFO(this->get_logger(), "DEBUG: Sending cmd packet, mid: %02x . Buffer size: %lu", mid, data_buffer_size);
   pc_->send(mid, &data_buffer, data_buffer_size);
 
 }

@@ -36,7 +36,8 @@ add_library(basic_communication src/basic_communication.cpp)
 add_library(ground_conversion SHARED 
             src/ground_conversion.cpp
             src/parser_utils.cpp
-            src/debug_utils.cpp)
+            src/debug_utils.cpp
+            src/memory_utils.cpp)
 ament_target_dependencies(ground_conversion
   rclcpp
   ${dependencies}

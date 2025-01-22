@@ -259,14 +259,10 @@ void GroundConversion::receiveTelemetry()
      if( hasMid(mid, topic_name) )
      {  
         // DEBUG
-        RCLCPP_INFO(this->get_logger(), "Mid received (%04x) corresponds to topic: %s . Buffer size: %lu", mid, topic_name.c_str(), buffer_size);
+        RCLCPP_DEBUG(this->get_logger(), "Mid received (%04x) corresponds to topic: %s . Buffer size: %lu", mid, topic_name.c_str(), buffer_size);
         //RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
         // tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
         // tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
-
-         // Debug
-         //std::string s = getBufferString(buffer, buffer_size);                   
-         //RCLCPP_INFO(this->get_logger(), "** Tlm buffer received (%ld): \n %s ", buffer_size, s.c_str());        
          
          // Publish data
          rcutils_uint8_array_t* serialized_array = nullptr;
@@ -332,7 +328,6 @@ void GroundConversion::subscriberCallback(const std::shared_ptr<const rclcpp::Se
   
   // Send data to cFS
   //RCLCPP_INFO(this->get_logger(), "DEBUG: Sending cmd packet, mid: %02x . Buffer size: %lu", mid, data_buffer_size);
-  //RCLCPP_INFO(this->get_logger(), "DEBUG -- Send back to cFS: Subscribed to: %s", _topic_name.c_str());
   bc_.sendCmdPacket(mid, code, seq, &data_buffer, data_buffer_size);  
 }
 

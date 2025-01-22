@@ -212,7 +212,7 @@ int PeerCommunication::handleSbnMsg(uint8_t* _buf, const ssize_t &_buf_size,
      
    // Update connection/heartbeat status for this peer
    updatePeer(peer);
-   RCLCPP_INFO(node_->get_logger(), "DEBUG -- Handling sbn message of type: %02x", sbn_type);
+   RCLCPP_DEBUG(node_->get_logger(), " Handling sbn message of type: %02x", sbn_type);
    switch(sbn_type)
    {
       // Subscription message
@@ -392,7 +392,8 @@ size_t PeerCommunication::readSbnHeader(uint8_t* _buf,
    // Read spacecraft id (4)
    sz = read_lb_uint32(_buf, offset, _spacecraft_id);
    offset += sz;
-   RCLCPP_INFO(node_->get_logger(), "* Msg size: %d sbn msg type: %02x processor id: %d spacecraft id: %d . Buff size: %d", 
+   
+   RCLCPP_DEBUG(node_->get_logger(), "* Msg size: %d sbn msg type: %02x processor id: %d spacecraft id: %d . Buff size: %d", 
                _msg_size, _msg_type, _processor_id, _spacecraft_id, _buf_size);
    
    return offset;
@@ -441,15 +442,15 @@ bool PeerCommunication::sendCfeMsg(SbnPeer* _peer,
 
    size_t offset = 0;
    size_t sz;
-   
+
    sz = writeSbnHeader(&cfe_msg, msg_size_minus_header, msg_type);
    offset += sz;
     
    sz = writeCmdPacket(cfe_msg + offset, _mid, _data_buffer, _data_size);
    offset += sz;
-   
+    
    bool res = this->_send(cfe_msg, msg_size, _peer);
-
+   
    // Cleanup
    free(cfe_msg);
    

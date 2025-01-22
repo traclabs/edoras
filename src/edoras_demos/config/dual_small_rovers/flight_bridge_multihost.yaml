@@ -5,10 +5,10 @@ flight_conversion_node:
     communication:
   
       # FSW information
-      peer_ip: "127.0.0.1"   # IP for fsw
-      peer_port: 2234     # 2234 for single-host (cpu1), 2235 for cpu2
-      peer_processor_id: 1  # Processor id
-      peer_spacecraft_id: 0x42 # Spacecraft id = 66 = 0x42
+      peer_ip: "10.5.0.3"   # IP for fsw
+      peer_port: 2235     # 2234 for single-host (cpu1), 2235 for cpu2
+      peer_processor_id: 2  # Processor id
+      peer_spacecraft_id: 0x42 # Spacecraft id
       
       # rosfsw information
       udp_receive_port: 2236

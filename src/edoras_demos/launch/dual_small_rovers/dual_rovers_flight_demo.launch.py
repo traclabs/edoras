@@ -29,28 +29,9 @@ def generate_launch_description():
          '/dual_rovers_gazebo_sim.launch.py']),
       launch_arguments={'rviz': 'false'}.items()
     )
-    
-    # Throttle: msgs_per_sec: 5
-    throttle_flight_pose_1_node = Node(
-        package="topic_tools",
-        executable="throttle",
-        name="throttle_flight_pose_1",
-        output="screen",
-        arguments=["messages", "/robot_1/pose", "5", "/robot_1/throttled_pose"]
-    )     
-    
-    # Throttle: msgs_per_sec: 5
-    throttle_flight_pose_2_node = Node(
-        package="topic_tools",
-        executable="throttle",
-        name="throttle_flight_pose_2",
-        output="screen",
-        arguments=["messages", "/robot_2/pose", "5", "/robot_2/throttled_pose"]
-    )     
-
-    
+        
     # Edoras Bridge
-    config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'flight_bridge.yaml')
+    config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'flight_bridge_multihost.yaml')
 
     edoras_bridge = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
@@ -64,8 +45,6 @@ def generate_launch_description():
 
     nodes_to_start = [
         sim_rovers,
-        throttle_flight_pose_1_node,
-        throttle_flight_pose_2_node,        
         edoras_bridge
     ]
 
