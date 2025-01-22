@@ -251,34 +251,40 @@ void GroundConversion::receiveTelemetry()
   std::vector<uint8_t> tlm_header_debug;
   uint8_t* buffer = NULL;  
   size_t buffer_size;
-
-  if( bc_.receiveTlmPacket(mid, &buffer, tlm_header_debug, buffer_size))
+  bool received_data;
+  
+  do
   {
-     // Check if this telemetry's mid is one our application cares to hear
-     std::string topic_name;
-     if( hasMid(mid, topic_name) )
-     {  
-        // DEBUG
-        RCLCPP_DEBUG(this->get_logger(), "Mid received (%04x) corresponds to topic: %s . Buffer size: %lu", mid, topic_name.c_str(), buffer_size);
-        //RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
-        // tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
-        // tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
+     received_data = bc_.receiveTlmPacket(mid, &buffer, tlm_header_debug, buffer_size);
+     if( received_data )
+     {
+        // Check if this telemetry's mid is one our application cares to hear
+        std::string topic_name;
+        if( hasMid(mid, topic_name) )
+        {  
+           // DEBUG
+           RCLCPP_DEBUG(this->get_logger(), "Mid received (%04x) corresponds to topic: %s . Buffer size: %lu", mid, topic_name.c_str(), buffer_size);
+           //RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
+           // tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
+           // tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
          
-         // Publish data
-         rcutils_uint8_array_t* serialized_array = nullptr;
-         serialized_array = make_serialized_array(buffer);
-         rclcpp::SerializedMessage serialized_msg(*serialized_array);
-         publishers_[topic_name]->publish(serialized_msg);
+           // Publish data
+           rcutils_uint8_array_t* serialized_array = nullptr;
+           serialized_array = make_serialized_array(buffer);
+           rclcpp::SerializedMessage serialized_msg(*serialized_array);
+           publishers_[topic_name]->publish(serialized_msg);
          
-         // Clean up
-         free(buffer);
-         rmw_ret_t res = rcutils_uint8_array_fini(serialized_array);
-         if(res != RCUTILS_RET_OK)
-           RCLCPP_ERROR(this->get_logger(), "releasing resources from serialized_array used to publish  tlm!");  
+           // Clean up
+           free(buffer);
+           rmw_ret_t res = rcutils_uint8_array_fini(serialized_array);
+           if(res != RCUTILS_RET_OK)
+             RCLCPP_ERROR(this->get_logger(), "releasing resources from serialized_array used to publish  tlm!");  
      
-     }   
-  }
+        } // if hasMid   
+     
+     } // if received_data
 
+  } while(received_data);
 }
 
 /**

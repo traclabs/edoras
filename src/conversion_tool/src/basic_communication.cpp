@@ -146,8 +146,8 @@ bool BasicCommunication::receiveTlmPacket(uint16_t &_mid, uint8_t** _buffer,
    uint8_t buffer_rcvd[MAXLINE];
    
    // Receive............
-   // (unsigned char*)
    buffer_rcvd_size = recvfrom(sock_fd_, (uint8_t*) buffer_rcvd, MAXLINE, MSG_DONTWAIT, (struct sockaddr*)NULL, NULL);
+
    if(buffer_rcvd_size > (ssize_t) offset)
    { 
       // DEBUG --------------------
@@ -164,14 +164,7 @@ bool BasicCommunication::receiveTlmPacket(uint16_t &_mid, uint8_t** _buffer,
       
       *_buffer = static_cast<uint8_t *>( malloc(_buffer_size) );
       memcpy(*_buffer, buffer_rcvd + offset, _buffer_size);
-
-      // See buffer contents
-      /*for(int i = 0; i < _buffer_size; i++)
-      { printf(" %02x ", *(*_buffer + i) );
-        if(i % 8 == 7)
-          printf("\n");
-      } printf("\n");*/
-         
+ 
       return true;
       
    } // if buffer_rcvd_size > 0

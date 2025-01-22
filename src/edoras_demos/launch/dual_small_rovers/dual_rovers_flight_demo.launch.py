@@ -11,15 +11,13 @@ import os
 def generate_launch_description():
     declared_arguments = []
 
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "rviz",
-            default_value='true',
-            description="launch rviz",
-        )
-    )
+    declared_arguments.append( DeclareLaunchArgument("rviz", default_value='true',
+                               description="launch rviz") )
+    declared_arguments.append( DeclareLaunchArgument("use_sim_time", default_value='true',
+                               description="use_sim_time True if gazebo is being used") )
 
     rviz = LaunchConfiguration("rviz")
+    use_sim_time = LaunchConfiguration("use_sim_time")
 
     # Rovers simulation
     # ros2 topic pub --rate 30 /robot_1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.1, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}"
@@ -31,13 +29,13 @@ def generate_launch_description():
     )
         
     # Edoras Bridge
-    config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'flight_bridge_multihost.yaml')
+    config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'flight_bridge.yaml')
 
     edoras_bridge = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('conversion_tool'), 
          'launch', 'flight_conversion.launch.py')]),
-      launch_arguments={'config': config}.items()
+      launch_arguments={'config': config, 'use_sim_time': use_sim_time}.items()
     )
   
 

@@ -249,29 +249,34 @@ void FlightConversion::receiveTelemetry()
   uint16_t mid;
   std::vector<uint8_t> tlm_header_debug;
   uint8_t* buffer = NULL;  
-
-  if( pc_->receiveTlmPacket(mid, &buffer))
+  bool received_data;
+  do
   {
-     // Check if this telemetry's mid is one our application cares to hear
-     std::string topic_name;
-     if( hasMid(mid, topic_name) )
-     {  
-        RCLCPP_DEBUG(this->get_logger(), "Mid received (%04x) corresponds to topic: %s .", mid, topic_name.c_str());
+     received_data = pc_->receiveTlmPacket(mid, &buffer);
+     if( received_data )
+     {
+        // Check if this telemetry's mid is one our application cares to hear
+        std::string topic_name;
+        if( hasMid(mid, topic_name) )
+        {  
+           RCLCPP_DEBUG(this->get_logger(), "Mid received (%04x) corresponds to topic: %s .", mid, topic_name.c_str());
 
-         // Publish data
-         rcutils_uint8_array_t* serialized_array = nullptr;
-         serialized_array = make_serialized_array(buffer);
-         rclcpp::SerializedMessage serialized_msg(*serialized_array);
-         publishers_[topic_name]->publish(serialized_msg);
+           // Publish data
+           rcutils_uint8_array_t* serialized_array = nullptr;
+           serialized_array = make_serialized_array(buffer);
+           rclcpp::SerializedMessage serialized_msg(*serialized_array);
+           publishers_[topic_name]->publish(serialized_msg);
          
-         // Clean up
-         free(buffer);
-         rmw_ret_t res = rcutils_uint8_array_fini(serialized_array);
-         if(res != RCUTILS_RET_OK)
-           RCLCPP_ERROR(this->get_logger(), "releasing resources from serialized_array used to publish  tlm!");
+           // Clean up
+           free(buffer);
+           rmw_ret_t res = rcutils_uint8_array_fini(serialized_array);
+           if(res != RCUTILS_RET_OK)
+             RCLCPP_ERROR(this->get_logger(), "releasing resources from serialized_array used to publish  tlm!");
      
-     } // hasMid   
-  }
+         } // hasMid
+     } // if received_data    
+
+  } while(received_data);
 
 }
 
@@ -338,7 +343,6 @@ void FlightConversion::subscriberCallback(const std::shared_ptr<const rclcpp::Se
   //debug_parse_message(data_buffer, cmd_info_[_topic_name].type_info);
    
   uint16_t mid = cmd_info_[_topic_name].mid;
-  
   // Send data to cFS
   pc_->send(mid, &data_buffer, data_buffer_size);
 

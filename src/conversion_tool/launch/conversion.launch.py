@@ -8,7 +8,9 @@ from launch.event_handlers import (OnExecutionComplete, OnProcessExit, OnProcess
 
 ARGUMENTS = [
     DeclareLaunchArgument('config', default_value='',
-                          description='Configuration file for bridge')
+                          description='Configuration file for bridge'),
+    DeclareLaunchArgument('use_sim_time', default_value='false',
+                          description='Configuration file for bridge')                          
 ]
 
 # If you want to use ros2 node list, sometimes the nodes do not appear
@@ -23,7 +25,8 @@ def generate_launch_description():
           executable='ground_conversion_node',
           name='conversion_node',
           output='screen',
-          parameters=[LaunchConfiguration("config")]
+          parameters=[LaunchConfiguration("config"),
+            {'use_sim_time' :LaunchConfiguration("use_sim_time")}]
           ) 
 
   # Request Telemetry back

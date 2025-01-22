@@ -17,7 +17,8 @@ int main(int argc, char* argv[])
   if ( !ground_conversion->initCommunication() )
     return 1;
 
-  rclcpp::spin(ground_conversion);
-
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(ground_conversion);
+  executor.spin();
   rclcpp::shutdown();
 }

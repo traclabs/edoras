@@ -11,8 +11,8 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 ARGUMENTS = [
     DeclareLaunchArgument('rviz', default_value='true',
                           description='rviz in Ground'),
-    DeclareLaunchArgument('odom_in_cfs', default_value='rover_app_get_robot_odom',
-                          description='topic name for odom cfs tlm'),
+    DeclareLaunchArgument('use_sim_time', default_value='True',
+                          description='use_sim_time true if gazebo'),
 ]
 
 # If you want to use ros2 node list, sometimes the nodes do not appear
@@ -23,6 +23,7 @@ ARGUMENTS = [
 def generate_launch_description():
 
   rviz = LaunchConfiguration("rviz")
+  use_sim_time = LaunchConfiguration("use_sim_time")
   
   # Send commands
   steering_1 = Node(
@@ -52,6 +53,7 @@ def generate_launch_description():
         name="rviz2_ground",
         output="screen",
         arguments=["-d", rviz_config_file],
+        parameters=[{'use_sim_time': use_sim_time}],
         condition=IfCondition(rviz)
   )  
 
@@ -73,16 +75,15 @@ def generate_launch_description():
         arguments=["messages", "/robot_2/cmd_vel", "5", "/robot_2/throttled_cmd_vel"]
   )     
 
-
-
   # Edoras Bridge
-  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'ground_bridge_multihost.yaml')
+  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'ground_bridge.yaml')
 
   edoras_bridge = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('conversion_tool'), 
          'launch', 'conversion.launch.py')]),
-      launch_arguments={'config': config}.items()
+      launch_arguments={'config': config,
+                        'use_sim_time': use_sim_time}.items()
   )
 
   ld = LaunchDescription(ARGUMENTS)
