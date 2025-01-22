@@ -48,6 +48,7 @@ add_executable(rover_comm_udp_node
 )
 ament_target_dependencies(rover_comm_udp_node ${dependencies} )
 
+ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/hooks/${PROJECT_NAME}.dsv.in")
 
 add_executable(fake_base_cmd src/fake_base_cmd.cpp)
 ament_target_dependencies(fake_base_cmd ${dependencies} )
@@ -73,6 +74,7 @@ install(DIRECTORY
   robots
   config
   worlds
+  models
   DESTINATION share/${PROJECT_NAME}/
 )
 
