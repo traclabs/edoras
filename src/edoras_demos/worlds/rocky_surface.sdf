@@ -17,11 +17,6 @@
       <render_engine>ogre2</render_engine>
     </plugin>
 
-    <!--<include>
-      <uri>model://apollo15_landing_site_1000x1000</uri>
-      <name>apollo15</name>
-      <pose>0 0 -0.0 0 0 0</pose>
-    </include>-->
 
     <!-- Sun -->
     <light name='sun' type='directional'>
@@ -40,8 +35,39 @@
 
    <gravity>0 0 -9.8</gravity>
 
+    <include>
+      <uri> lunar_surface </uri>
+      <pose>0 0 209.0 0 0 0</pose>
+    </include>
 
-       <model name='ground_plane'>
+    <include>
+      <uri> moon_base </uri>
+      <pose>16.80 -18.64 4.23 1.57 0 2.63</pose>
+    </include>
+
+    <include>
+      <uri> solar_panel </uri>
+      <pose>6 -8 4 1.57 0 0</pose>      
+    </include>
+
+    <include>
+      <uri> X1 </uri>
+      <pose>-2.51 2.57 4.42 0 0 -1.92s</pose>
+      
+    </include>
+
+    <include>
+      <uri> X2 </uri>
+      <pose>-2.93 -1.67 4.15 0 0 -1</pose>
+    </include>
+    
+        <!--<include>
+      <uri>model://enceladus_surface</uri>
+      <name>enceladus_surface</name>
+      <pose>0 0 -0.0 0 0 0</pose>
+    </include>-->
+
+     <!--  <model name='ground_plane'>
             <static>1</static>
             <link name='link'>
                 <collision name='collision'>
@@ -76,7 +102,7 @@
             </link>
             <plugin name='__default__' filename='__default__' />
             <pose>0 0 0 0 -0 0</pose>
-        </model>
+        </model>-->
 
   </world>
 </sdf>
