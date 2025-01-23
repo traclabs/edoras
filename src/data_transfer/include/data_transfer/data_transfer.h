@@ -3,79 +3,65 @@
  */
 #include <rclcpp/rclcpp.hpp>
 #include <std_srvs/srv/set_bool.hpp>
+#include <edoras_msgs/srv/start_store_data.hpp>
+#include <edoras_msgs/srv/stop_store_data.hpp>
+#include <edoras_msgs/srv/add_store_data.hpp>
+#include <mutex>
 
-struct CmdInfo_t {
+struct StoreDataInfo_t {
+//  StoreDataInfo_t( const std::string &_msg_type, const std::string &_topic,
+ //                  int _write_rate );
+                   
   std::string msg_type;
   std::string topic;
-  uint16_t mid;
-  std::string interface_name;
-  std::string interface_type;
-  std::shared_ptr<rcpputils::SharedLibrary> library; 
-  const TypeSupport_t* type_support;
-  const TypeInfo_t* type_info;
-};
-
-struct TlmInfo_t {
-  std::string msg_type;
-  std::string topic;
-  uint16_t mid;
+  int write_rate;
+  rclcpp::TimerBase::SharedPtr timer_save;
+  rclcpp::SerializedMessage data;
+  std::mutex mux;
 
 };
 
 /**
- * @class GroundConversion
+ * @class DataTransfer
  */
-class GroundConversion : public rclcpp::Node {
+class DataTransfer : public rclcpp::Node {
 
 public:
 
-  GroundConversion();
+  DataTransfer();
+  bool initialize();
   bool parseConfigParams();
-  bool initCommunication();
-  bool enableTOLabOutputCmd(bool _enable);
 
 protected:
 
-  bool parseComm();
-  void receiveTelemetry();
-  bool loadCommandInfo( const std::vector<std::string> &_cmd_vals);
-  bool loadTelemetryInfo( const std::vector<std::string> &_tlm_vals);
+  bool loadStoreData( const std::vector<std::string> &_data_vals);
+
+  void add_store(const std::shared_ptr<edoras_msgs::srv::AddStoreData::Request> _req,
+                 std::shared_ptr<edoras_msgs::srv::AddStoreData::Response> _res);
+  void start_store(const std::shared_ptr<edoras_msgs::srv::StartStoreData::Request> _req,
+                 std::shared_ptr<edoras_msgs::srv::StartStoreData::Response> _res);
+  void stop_store(const std::shared_ptr<edoras_msgs::srv::StopStoreData::Request> _req,
+                 std::shared_ptr<edoras_msgs::srv::StopStoreData::Response> _res);  
   
-  bool hasMid(const uint16_t &_mid, std::string &_topic);
+  void writeData(const std::string &_topic_name);
   bool addPublisher(const std::string &_topic_name, const std::string &_message_type);
   bool addSubscriber(const std::string &_topic_name, const std::string &_message_type);
 
-  void subscriberCallback(const std::shared_ptr<const rclcpp::SerializedMessage> _msg, const std::string &_topic_name);
-  void to_lab_enable_output_cmd(const std::shared_ptr<std_srvs::srv::SetBool::Request> _req,
-                                std::shared_ptr<std_srvs::srv::SetBool::Response> _res);
-
-  void member_to_yaml(const rosidl_typesupport_introspection_c__MessageMember & member_info, uint8_t * member_data);
-
-  // Helper functions
-  std::string getBufferString(uint8_t* _buffer, size_t _buffer_size);
-
+  void subscriberCallback(const std::shared_ptr<const rclcpp::SerializedMessage> _msg, 
+                          const std::string &_topic_name);
+                                
   std::unordered_map< std::string, std::shared_ptr<rclcpp::GenericPublisher> > publishers_;
   std::unordered_map< std::string, std::shared_ptr<rclcpp::GenericSubscription> > subscribers_;
 
-  // Params
-  int own_port_;
-  int fsw_port_;
-  std::string fsw_ip_;
-  std::string telemetry_ip_;
-
-  // For Phase I easiness
-  std::string bridge_ip_;
-
   // Communication
-  BasicCommunication bc_; 
   rclcpp::TimerBase::SharedPtr timer_comm_tlm_;
   int tlm_rate_ms_;
   
   //
-  std::map<std::string, CmdInfo_t> cmd_info_;
-  std::map<std::string, TlmInfo_t> tlm_info_;
+  std::map<std::string, std::shared_ptr<StoreDataInfo_t> > data_info_;
   
-  // Helper to_lab_enable_output_cmd
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr srv_to_lab_; 
-
+  // Helper
+  rclcpp::Service<edoras_msgs::srv::AddStoreData>::SharedPtr srv_add_store_; 
+  rclcpp::Service<edoras_msgs::srv::StartStoreData>::SharedPtr srv_start_store_;
+  rclcpp::Service<edoras_msgs::srv::StopStoreData>::SharedPtr srv_stop_store_;  
 };

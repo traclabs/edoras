@@ -1,23 +1,22 @@
 /**
- * @function ground_conversion_node
+ * @function data_transfer_node.cpp
  */
-#include <conversion_tool/ground_conversion.h>
+#include <data_transfer/data_transfer.h>
 
 int main(int argc, char* argv[])
 {
   rclcpp::init(argc, argv);
 
   // Create conversion tool
-  auto ground_conversion = std::make_shared<GroundConversion>();
+  auto data_transfer = std::make_shared<DataTransfer>();
 
   // Initialize
-  if ( !ground_conversion->parseConfigParams() )
+  if ( !data_transfer->parseConfigParams() )
     return 1;
 
-  if ( !ground_conversion->initCommunication() )
+  if ( !data_transfer->initialize() )
     return 1;
 
-  rclcpp::spin(ground_conversion);
-
+  rclcpp::spin(data_transfer);
   rclcpp::shutdown();
 }

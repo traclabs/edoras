@@ -14,6 +14,7 @@ set(dependencies
   sensor_msgs
   std_msgs
   std_srvs
+  edoras_msgs
 )
 
 find_package(ament_cmake REQUIRED)
@@ -29,7 +30,7 @@ endforeach()
 include_directories(include)
 
 
-# ground_conversion -------------
+# data transfer -------------
 add_library(data_transfer SHARED 
             src/data_transfer.cpp)
 ament_target_dependencies(data_transfer
@@ -38,26 +39,12 @@ ament_target_dependencies(data_transfer
 )
 #target_link_libraries(data_transfer xxx)
 
-# Tools ***************************************
-#add_executable(test_publisher tools/test_publisher.cpp)
-#ament_target_dependencies(test_publisher
-#  rclcpp
-#  ${dependencies}
-#)
-
-#add_executable(test_publisher_rover tools/test_publisher_rover.cpp)
-#ament_target_dependencies(test_publisher_rover
-#  rclcpp
-#  ${dependencies}
-#)
-# Tools ***************************************
-
-#add_executable(ground_conversion_node src/ground_conversion_node.cpp)
-#ament_target_dependencies(ground_conversion_node
-#  rclcpp
-#  ${dependencies}
-#)
-#target_link_libraries(ground_conversion_node ground_conversion)
+add_executable(data_transfer_node src/data_transfer_node.cpp)
+ament_target_dependencies(data_transfer_node
+  rclcpp
+  ${dependencies}
+)
+target_link_libraries(data_transfer_node data_transfer)
 
 ament_export_dependencies(
   rclcpp
@@ -74,7 +61,7 @@ install(TARGETS
 
 
 # Install Python modules
-ament_python_install_package(${PROJECT_NAME})
+#ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
 #install(PROGRAMS
