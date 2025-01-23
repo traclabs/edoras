@@ -288,14 +288,13 @@ void PeerCommunication::processSbnUnsubscriptionMsg(uint8_t *_buf, SbnPeer* _pee
  */
 void PeerCommunication::processSbnProtocolMsg(uint8_t *_buf)
 {  
-   RCLCPP_WARN(node_->get_logger(), "Process sbn protocol!");
    size_t offset = EDORAS_SBN_HDR_SIZE;
     
    // Read protocol
    uint8_t protocol;
    read_lb_uint8(_buf, offset, protocol);
 
-   RCLCPP_WARN(node_->get_logger(), "Process sbn protocol: %u", protocol);
+   RCLCPP_DEBUG(node_->get_logger(), "Processed sbn protocol = %u", protocol);
 }
 
 /**

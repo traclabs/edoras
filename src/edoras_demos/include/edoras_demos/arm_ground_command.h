@@ -26,7 +26,7 @@ class ArmGroundCommand
 {
 public:
   ArmGroundCommand(rclcpp::Node::SharedPtr _nh);
-  void init(std::string _reference_frame="world");
+  void init(std::string _reference_frame="world",  std::string _output_topic = "command_pose");
   void stop();
   
   visualization_msgs::msg::Marker makeBox( visualization_msgs::msg::InteractiveMarker &msg );

@@ -36,6 +36,13 @@ add_executable(arm_comm_udp_node
 )
 ament_target_dependencies(arm_comm_udp_node ${dependencies} )
 
+add_executable(arm_comm_default_node 
+  src/arm_comm_default_node.cpp
+  src/arm_comm_default.cpp
+)
+ament_target_dependencies(arm_comm_default_node ${dependencies} )
+
+
 add_executable(arm_ground_command 
   src/arm_ground_command.cpp
 )
@@ -63,6 +70,7 @@ install(TARGETS
   arm_ground_command
   arm_comm_udp_node
   rover_comm_udp_node
+  arm_comm_default_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

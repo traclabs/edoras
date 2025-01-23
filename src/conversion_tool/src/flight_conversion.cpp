@@ -207,7 +207,7 @@ bool FlightConversion::initCommunication()
    pc_.reset(new PeerCommunication(shared_from_this()));
    if(!pc_->initialize( udp_receive_port_, udp_receive_ip_, spacecraft_id_, processor_id_, error_str))
    {
-      RCLCPP_INFO(this->get_logger(), "Failed in initializing the Peer Communication module");
+      RCLCPP_INFO(this->get_logger(), "Failed in initializing the Peer Communication module: %s", error_str.c_str());
       return false;
    }
 
