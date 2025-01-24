@@ -7,7 +7,6 @@ data_transfer_node:
       fsw_port: 1234	
       fsw_ip: "127.0.0.1"
   
-#    command: ['cmd_twist']
     store_data: ['tlm_scan_1', 'tlm_scan_2']
     
 
@@ -15,16 +14,13 @@ data_transfer_node:
       type: "sensor_msgs/msg/LaserScan"
       topic: "/robot_1/scan"
       rate:  "2000" # 2seconds = 2000 ms
-#      mid: 0x1827 # GATEWAY_APP_CMD_MID 
-
-#    js_cmd:
-#      type: "sensor_msgs/msg/JointState"
-#      topic: "js_command"
-#      mid: 0x1827 # GATEWAY_APP_CMD_MID 
-
+      store_pkg: "data_transfer"
+      store_filename: "data/scan_1"
       
     tlm_scan_2:
       type: "sensor_msgs/msg/LaserScan"
       topic: "/robot_2/scan"
       rate: "5000"
-#      mid: 0x827 # GATEWAY_APP_TLM_MID
+      store_pkg: "data_transfer"
+      store_filename: "data/scan_2"
+

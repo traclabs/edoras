@@ -15,8 +15,9 @@
   <depend>sensor_msgs</depend>
   <depend>std_msgs</depend>
   <depend>std_srvs</depend>
-  <depend>rclcpp</depend>
   <depend>edoras_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>ament_index_cpp</depend>
 
 
   <test_depend>ament_copyright</test_depend>

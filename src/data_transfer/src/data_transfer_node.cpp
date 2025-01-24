@@ -11,9 +11,6 @@ int main(int argc, char* argv[])
   auto data_transfer = std::make_shared<DataTransfer>();
 
   // Initialize
-  if ( !data_transfer->parseConfigParams() )
-    return 1;
-
   if ( !data_transfer->initialize() )
     return 1;
 

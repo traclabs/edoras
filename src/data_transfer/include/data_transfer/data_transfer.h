@@ -15,6 +15,8 @@ struct StoreDataInfo_t {
   std::string msg_type;
   std::string topic;
   int write_rate;
+  std::string store_pkg;
+  std::string store_filename;
   rclcpp::TimerBase::SharedPtr timer_save;
   rclcpp::SerializedMessage data;
   std::mutex mux;
@@ -34,8 +36,9 @@ public:
 
 protected:
 
-  bool loadStoreData( const std::vector<std::string> &_data_vals);
-
+  bool loadWriteData( const std::vector<std::string> &_data_vals);
+  bool loadReadData( const std::vector<std::string> &_data_vals);
+  
   void add_store(const std::shared_ptr<edoras_msgs::srv::AddStoreData::Request> _req,
                  std::shared_ptr<edoras_msgs::srv::AddStoreData::Response> _res);
   void start_store(const std::shared_ptr<edoras_msgs::srv::StartStoreData::Request> _req,
@@ -44,6 +47,7 @@ protected:
                  std::shared_ptr<edoras_msgs::srv::StopStoreData::Response> _res);  
   
   void writeData(const std::string &_topic_name);
+  void readData(const std::string &_topic_name);  
   bool addPublisher(const std::string &_topic_name, const std::string &_message_type);
   bool addSubscriber(const std::string &_topic_name, const std::string &_message_type);
 
@@ -58,8 +62,9 @@ protected:
   int tlm_rate_ms_;
   
   //
-  std::map<std::string, std::shared_ptr<StoreDataInfo_t> > data_info_;
-  
+  std::map<std::string, std::shared_ptr<StoreDataInfo_t> > write_info_;
+ std::map<std::string, std::shared_ptr<StoreDataInfo_t> > read_info_;
+   
   // Helper
   rclcpp::Service<edoras_msgs::srv::AddStoreData>::SharedPtr srv_add_store_; 
   rclcpp::Service<edoras_msgs::srv::StartStoreData>::SharedPtr srv_start_store_;

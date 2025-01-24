@@ -59,12 +59,12 @@ def generate_launch_description():
     ) 
     
     # Edoras Bridge
-    config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'flight_bridge.yaml')
+    config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'data_transfer.yaml')
 
     edoras_bridge = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
-         get_package_share_directory('conversion_tool'), 
-         'launch', 'flight_conversion.launch.py')]),
+         get_package_share_directory('data_transfer'), 
+         'launch', 'data_transfer.launch.py')]),
       launch_arguments={'config': config}.items()
     )
   

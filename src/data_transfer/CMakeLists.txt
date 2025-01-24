@@ -15,6 +15,7 @@ set(dependencies
   std_msgs
   std_srvs
   edoras_msgs
+  ament_index_cpp
 )
 
 find_package(ament_cmake REQUIRED)
@@ -32,7 +33,10 @@ include_directories(include)
 
 # data transfer -------------
 add_library(data_transfer SHARED 
-            src/data_transfer.cpp)
+            src/data_transfer.cpp
+            src/parser_utils.cpp
+)
+
 ament_target_dependencies(data_transfer
   rclcpp
   ${dependencies}
@@ -71,7 +75,7 @@ install(TARGETS
 
 # Install folders
 install(DIRECTORY
-  config launch
+  config launch data
   DESTINATION share/${PROJECT_NAME}/
 )
 
