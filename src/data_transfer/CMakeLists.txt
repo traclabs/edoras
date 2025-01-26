@@ -65,13 +65,14 @@ install(TARGETS
 
 
 # Install Python modules
-#ament_python_install_package(${PROJECT_NAME})
+ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
-#install(PROGRAMS
-#  scripts/parse_edoras_msgs.py
-#  DESTINATION lib/${PROJECT_NAME}
-#)
+install(PROGRAMS
+  scripts/flight_cfdp_transfer.py
+  scripts/ground_cfdp_transfer.py
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 # Install folders
 install(DIRECTORY

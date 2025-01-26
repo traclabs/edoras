@@ -1,4 +1,4 @@
-data_transfer_node:
+/**:
 
   ros__parameters:
   
@@ -6,9 +6,23 @@ data_transfer_node:
       bridge_port: 1235
       fsw_port: 1234	
       fsw_ip: "127.0.0.1"
+
+    cfdp:
+
+      ip: "127.0.0.1"
+      port:  5111
+      entity_id: 1
+
+
+      ip_peer: "127.0.0.1"
+      port_peer:  5222
+      entity_id_peer: 2
+            
+      store_package:  "data_transfer"
+      store_folder: "data/ground"
   
     write_data: ['tlm_scan_1', 'tlm_scan_2']
-    read_data: ['rx_scan_1', 'rx_scan_2']
+#    read_data: ['rx_scan_1', 'rx_scan_2']
 
 # Storing data
 
@@ -17,14 +31,14 @@ data_transfer_node:
       topic: "/robot_1/scan"
       rate:  2000 # 2seconds = 2000 ms
       store_pkg: "data_transfer"
-      store_filename: "data/tfx/scan_1"
+      store_filename: "data/scan_1"
       
     tlm_scan_2:
       type: "sensor_msgs/msg/LaserScan"
       topic: "/robot_2/scan"
       rate: 5000
       store_pkg: "data_transfer"
-      store_filename: "data/tfx/scan_2"
+      store_filename: "data/scan_2"
 
 # Retrieving data
 
