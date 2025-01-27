@@ -9,6 +9,9 @@ from cfdp.transport.udp import UdpTransport
 from cfdp.filestore import NativeFileStore
 import time
 
+#import logging
+#logging.basicConfig(level=logging.DEBUG)    
+
 class GroundEdorasCfdpTransfer(Node):
     """
     This class receives the Odometry information from topic /groundsystem/rover_app_hk_tlm
@@ -45,6 +48,7 @@ class GroundEdorasCfdpTransfer(Node):
         pkg_share_dir = get_package_share_directory(self.store_pkg)        
         self.filestore = pkg_share_dir + "/" + self.store_folder
         self.get_logger().info(" Filestore: %s" % self.filestore)
+       
         
         # Udp transport       
         self.udp_transport = UdpTransport(routing={"*": [(self.ip_peer, self.port_peer)]})
@@ -54,6 +58,7 @@ class GroundEdorasCfdpTransfer(Node):
         self.cfdp_entity = cfdp.CfdpEntity(entity_id=self.entity_id, 
                       filestore = NativeFileStore(self.filestore), 
                       transport = self.udp_transport)
+
 
     def testSend(self, filename):
       self.get_logger().info(" Testing sending: %s" % self.filestore)
@@ -68,18 +73,21 @@ class GroundEdorasCfdpTransfer(Node):
         time.sleep(0.1)
       self.get_logger().info("Done transmitting!")
 
+#cfdp_entity.shutdown()
+#udp_transport.unbind()
+    
 #################################
 def main(args=None):
 
     rclpy.init(args=args)
 
-    fect = GroundEdorasCfdpTransfer()
-    fect.testSend("flowers.jpeg") #("IMG_0928.mp4")
-    rclpy.spin(fect)
+    gect = GroundEdorasCfdpTransfer()
+    gect.testSend("/moveit_humble.mp4")
+    rclpy.spin(gect)
 
-    fect.destroy_node()
+    gect.destroy_node()
     rclpy.shutdown()
-
+  
 
 if __name__ == '__main__':
     main()

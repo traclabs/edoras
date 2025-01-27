@@ -8,6 +8,10 @@ import cfdp
 from cfdp.transport.udp import UdpTransport
 from cfdp.filestore import NativeFileStore
 
+#import logging
+#logging.basicConfig(level=logging.DEBUG)
+
+
 class FlightEdorasCfdpTransfer(Node):
     """
     This class receives the Odometry information from topic /groundsystem/rover_app_hk_tlm
@@ -19,15 +23,15 @@ class FlightEdorasCfdpTransfer(Node):
         super().__init__('flight_edoras_cfdp_transfer')
 
         self.declare_parameter('cfdp.ip',  "127.0.0.1")
-        self.declare_parameter('cfdp.port',  5111)
+        self.declare_parameter('cfdp.port',  5222)
         self.declare_parameter('cfdp.entity_id',  2)
 
         self.declare_parameter('cfdp.ip_peer',  "127.0.0.1")
-        self.declare_parameter('cfdp.port_peer',  5222)
+        self.declare_parameter('cfdp.port_peer',  5111)
         self.declare_parameter('cfdp.entity_id_peer',  1)
         
         self.declare_parameter('cfdp.store_package',  "data_transfer")
-        self.declare_parameter("cfdp.store_folder", "flight")        
+        self.declare_parameter("cfdp.store_folder", "data/flight")        
 
         self.ip = self.get_parameter('cfdp.ip').value
         self.port = self.get_parameter('cfdp.port').value
@@ -54,6 +58,7 @@ class FlightEdorasCfdpTransfer(Node):
                       filestore = NativeFileStore(self.filestore), 
                       transport = self.udp_transport)
 
+
 #################################
 def main(args=None):
 
@@ -65,6 +70,6 @@ def main(args=None):
     fect.destroy_node()
     rclpy.shutdown()
 
-
 if __name__ == '__main__':
     main()
+
