@@ -381,7 +381,7 @@ bool DataTransfer::addSubscriber(const std::string &_topic_name, const std::stri
 {
  auto sub = this->create_generic_subscription(_topic_name, _message_type,
       rclcpp::QoS(1), 
-      [this, _topic_name](std::shared_ptr<const rclcpp::SerializedMessage> _msg, const rclcpp::MessageInfo & _mi)
+      [this, _topic_name](std::shared_ptr<const rclcpp::SerializedMessage> _msg) //, const rclcpp::MessageInfo & _mi
       {
          this->subscriberCallback(_msg, _topic_name);
       } );

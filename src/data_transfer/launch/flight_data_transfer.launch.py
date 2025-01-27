@@ -22,7 +22,7 @@ def generate_launch_description():
 
   # Config
   config = LaunchConfiguration("config")
-  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'flight_data_transfer.yaml')
+  #config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'dual_small_rovers', 'flight_data_transfer.yaml')
 
   data_transfer_node = Node(
           package='data_transfer',
@@ -44,8 +44,8 @@ def generate_launch_description():
 
 
   ld = LaunchDescription(ARGUMENTS)
-  #ld.add_action(data_transfer_node)
-  ld.add_action(flight_cfdp_transfer)
+  ld.add_action(data_transfer_node)
+  #ld.add_action(flight_cfdp_transfer)
   return ld
   
 
