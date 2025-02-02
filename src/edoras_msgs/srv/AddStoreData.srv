@@ -1,0 +1,6 @@
+string topic
+string type
+uint8  rate
+---
+bool result
+string info

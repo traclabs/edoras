@@ -14,7 +14,9 @@ class SerializeRoverManual
  public:
  
  SerializeRoverManual();
- bool initializeComm( const int &_own_port, const int &_other_port, std::string &_error_msg);
+ bool initializeComm( const int &_own_port, const int &_fsw_port,
+                      const std::string &_robot_ip, 
+                      const std::string &_fsw_ip, std::string &_error_msg);
  bool sendMessage( geometry_msgs::msg::PoseStamped* _pm );
  bool receiveMessage(geometry_msgs::msg::Twist &_tm);
  

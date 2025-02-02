@@ -1,1 +1,0 @@
-/usr/bin/cc -Wl,--dependency-file,CMakeFiles/serialize_test.dir/link.d CMakeFiles/serialize_test.dir/serialize_test.c.o -o serialize_test  libserialize_library.a

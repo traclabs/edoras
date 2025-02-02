@@ -36,12 +36,26 @@ add_library(basic_communication src/basic_communication.cpp)
 add_library(ground_conversion SHARED 
             src/ground_conversion.cpp
             src/parser_utils.cpp
-            src/debug_utils.cpp)
+            src/debug_utils.cpp
+            src/memory_utils.cpp)
 ament_target_dependencies(ground_conversion
   rclcpp
   ${dependencies}
 )
 target_link_libraries(ground_conversion basic_communication)
+
+# flight_conversion -------------
+add_library(flight_conversion SHARED 
+            src/flight_conversion.cpp
+            src/peer_communication.cpp
+            src/sbn_peer.cpp
+            src/memory_utils.cpp
+            src/parser_utils.cpp
+            src/debug_utils.cpp)
+ament_target_dependencies(flight_conversion
+  rclcpp
+  ${dependencies}
+)
 
 # Tools ***************************************
 add_executable(test_publisher tools/test_publisher.cpp)
@@ -64,6 +78,14 @@ ament_target_dependencies(ground_conversion_node
 )
 target_link_libraries(ground_conversion_node ground_conversion)
 
+add_executable(flight_conversion_node src/flight_conversion_node.cpp)
+ament_target_dependencies(flight_conversion_node
+  rclcpp
+  ${dependencies}
+)
+target_link_libraries(flight_conversion_node flight_conversion)
+
+
 ament_export_dependencies(
   rclcpp
   rclpy
@@ -73,10 +95,12 @@ ament_export_dependencies(
 
 install(TARGETS
   basic_communication
-  ground_conversion 
+  ground_conversion
+  flight_conversion
   test_publisher
   test_publisher_rover
   ground_conversion_node
+  flight_conversion_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

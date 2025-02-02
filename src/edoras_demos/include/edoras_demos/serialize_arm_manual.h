@@ -14,7 +14,10 @@ class SerializeArmManual
  public:
  
  SerializeArmManual();
- bool initializeComm( const int &_own_port, const int &_other_port, std::string &_error_msg);
+ bool initializeComm( const int &_own_port, const int &_other_port, 
+                      const std::string &_robot_ip, 
+                      const std::string &_fsw_ip,
+                      std::string &_error_msg);
  bool sendMessage( sensor_msgs::msg::JointState* _js );
  bool receiveMessage(geometry_msgs::msg::Pose &_pose);
  

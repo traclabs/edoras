@@ -1,0 +1,43 @@
+flight_conversion_node:
+
+  ros__parameters:
+
+    communication:
+  
+      # FSW information
+      peer_ip: "127.0.0.1"   # IP for fsw
+      peer_port: 2234     # 2234 for single-host (cpu1), 2235 for cpu2
+      peer_processor_id: 1  # Processor id
+      peer_spacecraft_id: 0x42 # Spacecraft id = 66 = 0x42
+      
+      # rosfsw information
+      udp_receive_port: 2236
+      udp_receive_ip: '0.0.0.0'
+      processor_id: 3
+      spacecraft_id: 0x42 # 0x42 == 66 
+  
+  
+    command: ['js_tlm_1', 'js_tlm_2']
+    telemetry: ['pose_cmd_1', 'pose_cmd_2']
+
+    js_tlm_1:
+      type: "sensor_msgs/msg/JointState"
+      topic: "/big_arm/joint_states_throttled"
+      mid: 0x1829 # EDORAS_APP_TLM_1_FLIGHT_MID
+
+    js_tlm_2:
+      type: "sensor_msgs/msg/JointState"
+      topic: "/little_arm/joint_states_throttled"
+      mid: 0x182A # EDORAS_APP_TLM_2_FLIGHT_MID
+      
+    pose_cmd_1:
+      type: "geometry_msgs/msg/Pose"
+      topic: "/big_arm/flight/target_pose"
+      mid: 0x82A # EDORAS_APP_CMD_1_FLIGHT_MID 
+      
+    pose_cmd_2:
+      type: "geometry_msgs/msg/Pose"
+      topic: "/little_arm/flight/target_pose"
+      mid: 0x82B # EDORAS_APP_CMD_2_FLIGHT_MID
+
+

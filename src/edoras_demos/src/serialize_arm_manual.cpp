@@ -8,7 +8,9 @@ SerializeArmManual::SerializeArmManual()
 {} 
  
 bool SerializeArmManual::initializeComm( const int &_own_port, 
-                                         const int &_other_port, 
+                                         const int &_other_port,
+                                         const std::string &_robot_ip, 
+                                         const std::string &_fsw_ip, 
                                          std::string &_error_msg)
 {
     // Create socket
@@ -24,13 +26,13 @@ bool SerializeArmManual::initializeComm( const int &_own_port,
   
     // Fill server information
     own_address_.sin_family = AF_INET;
-    own_address_.sin_addr.s_addr = inet_addr("127.0.0.1"); //INADDR_ANY;
+    own_address_.sin_addr.s_addr = inet_addr(_robot_ip.c_str()); // "127.0.0.1" //INADDR_ANY;
     own_address_.sin_port = htons(_own_port);
 
 
     // Fill cFS information
     other_address_.sin_family = AF_INET;
-    other_address_.sin_addr.s_addr = inet_addr("127.0.0.1"); //INADDR_ANY;
+    other_address_.sin_addr.s_addr = inet_addr(_fsw_ip.c_str()); // "127.0.0.1" //INADDR_ANY;
     other_address_.sin_port = htons(_other_port);
   
     // Bind the socket

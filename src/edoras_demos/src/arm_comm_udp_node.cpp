@@ -6,16 +6,12 @@ int main(int argc, char * argv[])
   rclcpp::init(argc, argv);
   auto node = std::make_shared<ArmCommUdp>();
   
-  std::string js_topic = "/big_arm/joint_states";
-  std::string jc_topic = "/big_arm/joint_state_command";
-  int cfs_port = 8080;
-  int robot_port = 8585;
   int tlm_ms = 2000;
   int cmd_ms = 100;
   
-  node->initRobotComm(js_topic, jc_topic);
+  node->initRobotComm();
   
-  if(!node->initUdpComm(cfs_port, robot_port))
+  if(!node->initUdpComm())
   {
     RCLCPP_ERROR(node->get_logger(), "Error initializing communication");
     return 1;

@@ -4,6 +4,7 @@
 #include <conversion_tool/ground_conversion.h>
 #include <conversion_tool/parser_utils.h>
 #include <conversion_tool/debug_utils.h>
+#include <conversion_tool/memory_utils.h>
 
 #include <dlfcn.h>
 
@@ -46,7 +47,6 @@ bool GroundConversion::parseComm()
 
       own_port_ = comm_params["bridge_port"].as_int();
       fsw_port_ = comm_params["fsw_port"].as_int();
-      fsw_ip_ = comm_params["fsw_ip"].as_string();
       fsw_ip_ = comm_params["fsw_ip"].as_string();
       telemetry_ip_ = comm_params["telemetry_ip"].as_string();
       bridge_ip_ = comm_params["bridge_ip"].as_string();
@@ -251,60 +251,40 @@ void GroundConversion::receiveTelemetry()
   std::vector<uint8_t> tlm_header_debug;
   uint8_t* buffer = NULL;  
   size_t buffer_size;
-
-  if( bc_.receiveTlmPacket(mid, &buffer, tlm_header_debug, buffer_size))
-  {   
-     // Check if this telemetry's mid is one our application cares to hear
-     std::string topic_name;
-     if( hasMid(mid, topic_name) )
-     {  
-        // DEBUG
-        //RCLCPP_INFO(this->get_logger(), "Mid received (%04x) corresponds to topic: %s ", mid, topic_name.c_str());
-        //RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
-        // tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
-        // tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
-
-         // Debug
-         //std::string s = getBufferString(buffer, buffer_size);                   
-         //RCLCPP_INFO(this->get_logger(), "** Tlm buffer received (%ld): \n %s ", buffer_size, s.c_str());        
+  bool received_data;
+  
+  do
+  {
+     received_data = bc_.receiveTlmPacket(mid, &buffer, tlm_header_debug, buffer_size);
+     if( received_data )
+     {
+        // Check if this telemetry's mid is one our application cares to hear
+        std::string topic_name;
+        if( hasMid(mid, topic_name) )
+        {  
+           // DEBUG
+           RCLCPP_DEBUG(this->get_logger(), "Mid received (%04x) corresponds to topic: %s . Buffer size: %lu", mid, topic_name.c_str(), buffer_size);
+           //RCLCPP_INFO(this->get_logger(), "TLm Header received: %02x %02x %02x %02x %02x %02x %02x %02x ", 
+           // tlm_header_debug[0], tlm_header_debug[1], tlm_header_debug[2], tlm_header_debug[3], 
+           // tlm_header_debug[4], tlm_header_debug[5], tlm_header_debug[6], tlm_header_debug[7]);
          
-         // Publish data
-         rcutils_uint8_array_t* serialized_array = nullptr;
-         serialized_array = make_serialized_array(buffer);
-
-         rclcpp::SerializedMessage serialized_msg(*serialized_array);
-         publishers_[topic_name]->publish(serialized_msg);
+           // Publish data
+           rcutils_uint8_array_t* serialized_array = nullptr;
+           serialized_array = make_serialized_array(buffer);
+           rclcpp::SerializedMessage serialized_msg(*serialized_array);
+           publishers_[topic_name]->publish(serialized_msg);
          
-         // Clean up
-         free(buffer);
-         rmw_ret_t res = rcutils_uint8_array_fini(serialized_array);
-         if(res != RCUTILS_RET_OK)
-           RCLCPP_ERROR(this->get_logger(), "releasing resources from serialized_array used to publish  tlm!");  
+           // Clean up
+           free(buffer);
+           rmw_ret_t res = rcutils_uint8_array_fini(serialized_array);
+           if(res != RCUTILS_RET_OK)
+             RCLCPP_ERROR(this->get_logger(), "releasing resources from serialized_array used to publish  tlm!");  
      
-     }   
-  }
-
-}
-
-/**
- * @function getBufferString
- */
-std::string GroundConversion::getBufferString(uint8_t* _buffer, size_t _buffer_size)
-{
-   if(_buffer == NULL)
-     return std::string("");
+        } // if hasMid   
      
-   std::string s = "";
-   for(size_t i = 0; i < _buffer_size; i++)
-   {   
-      char bi[10];
-      sprintf(bi, "%02x", *(_buffer + i) );
-      s = s +  " " + bi;
-      if(i % 8 == 7 )
-        s = s + "\n";
-   }
+     } // if received_data
 
-   return s;
+  } while(received_data);
 }
 
 /**
@@ -370,7 +350,7 @@ bool GroundConversion::addSubscriber(const std::string &_topic_name, const std::
  
  auto sub = this->create_generic_subscription(_topic_name, _message_type,
       rclcpp::QoS(1), 
-      [this, _topic_name](std::shared_ptr<const rclcpp::SerializedMessage> _msg)
+      [this, _topic_name](std::shared_ptr<const rclcpp::SerializedMessage> _msg) //, const rclcpp::MessageInfo & _mi
       {
          this->subscriberCallback(_msg, _topic_name);
       } );

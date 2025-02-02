@@ -73,7 +73,7 @@ bool BasicCommunication::sendCmdPacket(const uint16_t &_mid, const uint8_t &_cod
     size_t buffer_length, buffer_capacity;
     memcpy(&buffer_length, cmd_packet + header_ccsds_offset, sizeof(size_t));
     memcpy(&buffer_capacity, cmd_packet + header_ccsds_offset + sizeof(size_t), sizeof(size_t));
-    printf("sendCmdPacket: Packet length: %d Buffer length: %ld -- capacity: %ld ! \n", cmd_packet_size, buffer_length, buffer_capacity); 
+    //printf("sendCmdPacket: Packet length: %d Buffer length: %ld -- capacity: %ld ! \n", cmd_packet_size, buffer_length, buffer_capacity); 
     // DEBUG END -----
     int res = sendto(sock_fd_, cmd_packet, cmd_packet_size, 0, (const struct sockaddr *)&fsw_address_, sizeof(fsw_address_));
     
@@ -146,8 +146,8 @@ bool BasicCommunication::receiveTlmPacket(uint16_t &_mid, uint8_t** _buffer,
    uint8_t buffer_rcvd[MAXLINE];
    
    // Receive............
-   // (unsigned char*)
    buffer_rcvd_size = recvfrom(sock_fd_, (uint8_t*) buffer_rcvd, MAXLINE, MSG_DONTWAIT, (struct sockaddr*)NULL, NULL);
+
    if(buffer_rcvd_size > (ssize_t) offset)
    { 
       // DEBUG --------------------
@@ -164,14 +164,7 @@ bool BasicCommunication::receiveTlmPacket(uint16_t &_mid, uint8_t** _buffer,
       
       *_buffer = static_cast<uint8_t *>( malloc(_buffer_size) );
       memcpy(*_buffer, buffer_rcvd + offset, _buffer_size);
-
-      // See buffer contents
-      /*for(int i = 0; i < _buffer_size; i++)
-      { printf(" %02x ", *(*_buffer + i) );
-        if(i % 8 == 7)
-          printf("\n");
-      } printf("\n");*/
-         
+ 
       return true;
       
    } // if buffer_rcvd_size > 0

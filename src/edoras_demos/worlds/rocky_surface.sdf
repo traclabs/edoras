@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="fixed_world">
+    <scene>
+      <grid>false</grid>
+    </scene>
+    <physics name="10ms" type="ignored">
+      <max_step_size>0.01</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    
+    <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics"></plugin>
+    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands"></plugin>
+    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster"></plugin>
+    
+    <plugin filename="ignition-gazebo-sensors-system" name="ignition::gazebo::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+
+    <!-- Sun -->
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+   <gravity>0 0 -9.8</gravity>
+
+    <include>
+      <uri> lunar_surface </uri>
+      <pose>0 0 209.0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri> moon_base </uri>
+      <pose>16.80 -18.64 4.23 1.57 0 2.63</pose>
+    </include>
+
+    <include>
+      <uri> solar_panel </uri>
+      <pose>6 -8 4 1.57 0 0</pose>      
+    </include>
+
+    <include>
+      <uri> X1 </uri>
+      <pose>-2.51 2.57 4.42 0 0 -1.92s</pose>
+      
+    </include>
+
+    <include>
+      <uri> X2 </uri>
+      <pose>-2.93 -1.67 4.15 0 0 -1</pose>
+    </include>
+    
+        <!--<include>
+      <uri>model://enceladus_surface</uri>
+      <name>enceladus_surface</name>
+      <pose>0 0 -0.0 0 0 0</pose>
+    </include>-->
+
+     <!--  <model name='ground_plane'>
+            <static>1</static>
+            <link name='link'>
+                <collision name='collision'>
+                    <geometry>
+                        <plane>
+                            <normal>0 0 1</normal>
+                            <size>100 100</size>
+                        </plane>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode />
+                        </friction>
+                        <bounce />
+                        <contact />
+                    </surface>
+                </collision>
+                <visual name='visual'>
+                    <geometry>
+                        <plane>
+                            <normal>0 0 1</normal>
+                            <size>100 100</size>
+                        </plane>
+                    </geometry>
+                    <material>
+                        <ambient>0.8 0.8 0.8 1</ambient>
+                        <diffuse>0.8 0.8 0.8 1</diffuse>
+                        <specular>0.8 0.8 0.8 1</specular>
+                    </material>
+                    <plugin name='__default__' filename='__default__' />
+                </visual>
+            </link>
+            <plugin name='__default__' filename='__default__' />
+            <pose>0 0 0 0 -0 0</pose>
+        </model>-->
+
+  </world>
+</sdf>

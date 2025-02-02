@@ -1,1 +1,0 @@
-/usr/bin/cc -Wl,--dependency-file,CMakeFiles/server_serialize_1.dir/link.d CMakeFiles/server_serialize_1.dir/server_serialize_1.c.o -o server_serialize_1  libserialize_library.a

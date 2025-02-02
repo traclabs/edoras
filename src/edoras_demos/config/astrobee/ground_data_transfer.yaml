@@ -1,0 +1,50 @@
+/**:
+
+  ros__parameters:
+  
+    communication:
+      bridge_port: 1235
+      fsw_port: 1234	
+      fsw_ip: "127.0.0.1"
+
+    cfdp:
+
+      ip: "127.0.0.1"
+      port:  5222
+      entity_id: 2
+
+
+      ip_peer: "127.0.0.1"
+      port_peer:  5111
+      entity_id_peer: 1
+            
+      store_package:  "data_transfer"
+      store_folder: "data/remote"
+  
+#    write_data: []
+    read_data: ['tlm_depth_haz', 'tlm_cam_nav']
+# Storing data
+
+    tlm_depth_haz:
+      type: "sensor_msgs/msg/PointCloud2"
+      topic: "/ground/hw/depth_haz/points"
+      rate:  2000 # 2seconds = 2000 ms
+      store_pkg: "data_transfer"
+      store_filename: "data/remote/depth_haz"
+      
+    tlm_cam_nav:
+      type: "sensor_msgs/msg/Image"
+      topic: "/ground/hw/cam_nav"
+      rate: 2000
+      store_pkg: "data_transfer"
+      store_filename: "data/remote/cam_nav"
+
+# Retrieving data
+
+#    rx_scan_1:
+#      type: "sensor_msgs/msg/LaserScan"
+#      topic: "/rx/robot_1/scan"
+#      rate:  1000
+#      store_pkg: "data_transfer"
+#      store_filename: "data/rcv/scan_1"
+

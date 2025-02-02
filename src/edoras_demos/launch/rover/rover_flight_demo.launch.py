@@ -116,6 +116,12 @@ def generate_launch_description():
         executable="rover_comm_udp_node",
         name="rover_comm_udp_node",
         output="screen",
+        parameters=[
+         {'cfs_port': 8080},
+         {'robot_port': 8585},
+         {'cfs_ip': "127.0.0.1"},
+         {'robot_ip': "127.0.0.1"}
+        ]
     )    
 
     nodes_to_start = [

@@ -1,0 +1,43 @@
+flight_conversion_node:
+
+  ros__parameters:
+
+    communication:
+  
+      # FSW information
+      peer_ip: "10.5.0.3"   # IP for fsw
+      peer_port: 2235     # 2234 for single-host (cpu1), 2235 for cpu2
+      peer_processor_id: 2  # Processor id
+      peer_spacecraft_id: 0x42 # Spacecraft id
+      
+      # rosfsw information
+      udp_receive_port: 2236
+      udp_receive_ip: '0.0.0.0'
+      processor_id: 3
+      spacecraft_id: 0x42 # 0x42 == 66 
+  
+  
+    command: ['pose_tlm_1', 'pose_tlm_2']
+    telemetry: ['twist_cmd_1', 'twist_cmd_2']
+
+    pose_tlm_1:
+      type: "geometry_msgs/msg/PoseStamped"
+      topic: "/robot_1/pose"
+      mid: 0x1829 # EDORAS_APP_POSE_1_FLIGHT_MID
+
+    pose_tlm_2:
+      type: "geometry_msgs/msg/PoseStamped"
+      topic: "/robot_2/pose"
+      mid: 0x182A # EDORAS_APP_POSE_2_FLIGHT_MID
+      
+    twist_cmd_1:
+      type: "geometry_msgs/msg/Twist"
+      topic: "/robot_1/cmd_vel"
+      mid: 0x82A # EDORAS_APP_TWIST_1_FLIGHT_MID 
+      
+    twist_cmd_2:
+      type: "geometry_msgs/msg/Twist"
+      topic: "/robot_2/cmd_vel"
+      mid: 0x82B # EDORAS_APP_TWIST_2_FLIGHT_MID
+
+

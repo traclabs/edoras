@@ -1,0 +1,101 @@
+- ros_topic_name: "/clock"
+  gz_topic_name: "/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "ignition.msgs.Clock" 
+#  lazy: true # default: false :o
+  direction: GZ_TO_ROS
+
+#####################
+## Robot 1         ##
+#####################
+
+- ros_topic_name: "/robot_1/cmd_vel"
+  gz_topic_name: "/robot_1/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/Twist"
+  gz_type_name: "ignition.msgs.Twist" 
+#  lazy: true
+  direction: ROS_TO_GZ
+  
+- ros_topic_name: "/robot_1/joint_states"
+  gz_topic_name: "/robot_1/joint_states"
+  ros_type_name: "sensor_msgs/msg/JointState"
+  gz_type_name: "gz.msgs.Model" 
+#  lazy: true
+  direction: GZ_TO_ROS
+  
+  
+- ros_topic_name: "/robot_1/scan"
+  gz_topic_name: "/robot_1/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan" 
+#  lazy: true
+  direction: GZ_TO_ROS  
+  
+- ros_topic_name: "/robot_1/odometry"
+  gz_topic_name: "/robot_1/odometry"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "ignition.msgs.Odometry" 
+#  lazy: true
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/robot_1/pose"
+  gz_topic_name: "/model/robot_1/pose"
+  ros_type_name: "geometry_msgs/msg/PoseStamped"
+  gz_type_name: "ignition.msgs.Pose" 
+#  lazy: true
+  direction: GZ_TO_ROS
+
+#- ros_topic_name: "/tf"
+#  gz_topic_name: "model/robot_1/pose"
+#  ros_type_name: "tf2_msgs/msg/TFMessage"
+#  gz_type_name: "gz.msgs.Pose_V"
+#  direction: GZ_TO_ROS  
+  
+#####################
+## Robot 2         ##
+#####################
+
+- ros_topic_name: "/robot_2/cmd_vel"
+  gz_topic_name: "/robot_2/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/Twist"
+  gz_type_name: "ignition.msgs.Twist" 
+#  lazy: true
+  direction: ROS_TO_GZ
+  
+- ros_topic_name: "/robot_2/joint_states"
+  gz_topic_name: "/robot_2/joint_states"
+  ros_type_name: "sensor_msgs/msg/JointState"
+  gz_type_name: "gz.msgs.Model" 
+#  lazy: true
+  direction: GZ_TO_ROS
+  
+  
+- ros_topic_name: "/robot_2/scan"
+  gz_topic_name: "/robot_2/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan" 
+#  lazy: true
+  direction: GZ_TO_ROS  
+  
+- ros_topic_name: "/robot_2/odometry"
+  gz_topic_name: "/robot_2/odometry"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "ignition.msgs.Odometry" 
+#  lazy: true
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/robot_2/pose"
+  gz_topic_name: "/model/robot_2/pose"
+  ros_type_name: "geometry_msgs/msg/PoseStamped"
+  gz_type_name: "ignition.msgs.Pose" 
+#  lazy: true
+  direction: GZ_TO_ROS
+
+#- ros_topic_name: "/tf"
+#  gz_topic_name: "model/robot_2/pose"
+#  ros_type_name: "tf2_msgs/msg/TFMessage"
+#  gz_type_name: "gz.msgs.Pose_V"
+#  direction: GZ_TO_ROS    
+  
+#    "/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V",
+#    '/imu/data@sensor_msgs/msg/Imu@gz.msgs.IMU',

@@ -53,9 +53,6 @@ protected:
 
   void member_to_yaml(const rosidl_typesupport_introspection_c__MessageMember & member_info, uint8_t * member_data);
 
-  // Helper functions
-  std::string getBufferString(uint8_t* _buffer, size_t _buffer_size);
-
   std::unordered_map< std::string, std::shared_ptr<rclcpp::GenericPublisher> > publishers_;
   std::unordered_map< std::string, std::shared_ptr<rclcpp::GenericSubscription> > subscribers_;
 

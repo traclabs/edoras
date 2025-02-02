@@ -1,0 +1,44 @@
+data_transfer_node:
+
+  ros__parameters:
+  
+    communication:
+      bridge_port: 1235
+      fsw_port: 1234	
+      fsw_ip: "127.0.0.1"
+  
+    write_data: ['tlm_scan_1', 'tlm_scan_2']
+    read_data: ['rx_scan_1', 'rx_scan_2']
+
+# Storing data
+
+    tlm_scan_1:
+      type: "sensor_msgs/msg/LaserScan"
+      topic: "/robot_1/scan"
+      rate:  2000 # 2seconds = 2000 ms
+      store_pkg: "data_transfer"
+      store_filename: "data/tfx/scan_1"
+      
+    tlm_scan_2:
+      type: "sensor_msgs/msg/LaserScan"
+      topic: "/robot_2/scan"
+      rate: 5000
+      store_pkg: "data_transfer"
+      store_filename: "data/tfx/scan_2"
+
+# Retrieving data
+
+    rx_scan_1:
+      type: "sensor_msgs/msg/LaserScan"
+      topic: "/rx/robot_1/scan"
+      rate:  1000
+      store_pkg: "data_transfer"
+      store_filename: "data/rcv/scan_1"
+      
+    rx_scan_2:
+      type: "sensor_msgs/msg/LaserScan"
+      topic: "/rx/robot_2/scan"
+      rate: 1000
+      store_pkg: "data_transfer"
+      store_filename: "data/rcv/scan_2"
+

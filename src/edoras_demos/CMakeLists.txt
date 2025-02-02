@@ -36,6 +36,13 @@ add_executable(arm_comm_udp_node
 )
 ament_target_dependencies(arm_comm_udp_node ${dependencies} )
 
+add_executable(arm_comm_default_node 
+  src/arm_comm_default_node.cpp
+  src/arm_comm_default.cpp
+)
+ament_target_dependencies(arm_comm_default_node ${dependencies} )
+
+
 add_executable(arm_ground_command 
   src/arm_ground_command.cpp
 )
@@ -48,6 +55,7 @@ add_executable(rover_comm_udp_node
 )
 ament_target_dependencies(rover_comm_udp_node ${dependencies} )
 
+ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/hooks/${PROJECT_NAME}.dsv.in")
 
 add_executable(fake_base_cmd src/fake_base_cmd.cpp)
 ament_target_dependencies(fake_base_cmd ${dependencies} )
@@ -62,6 +70,7 @@ install(TARGETS
   arm_ground_command
   arm_comm_udp_node
   rover_comm_udp_node
+  arm_comm_default_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -72,6 +81,8 @@ install(DIRECTORY
   rviz
   robots
   config
+  worlds
+  models
   DESTINATION share/${PROJECT_NAME}/
 )
 

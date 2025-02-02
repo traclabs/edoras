@@ -6,7 +6,16 @@ using std::placeholders::_1;
 
 ArmCommUdp::ArmCommUdp() :
 Node("arm_comm_udp")
-{      
+{
+  this->declare_parameter("joint_state", std::string("/big_arm/joint_states"));
+  this->declare_parameter("joint_command", std::string("/big_arm/joint_state_command"));
+    
+  this->declare_parameter("cfs_port", 8080);
+  this->declare_parameter("robot_port", 8585);  
+  this->declare_parameter("cfs_ip", std::string("127.0.0.1"));
+  this->declare_parameter("robot_ip", std::string("127.0.0.1"));    
+
+      
    base_link_ = "big_arm_link_1";
    tip_link_ = "big_arm_link_8";
    robot_description_ = "robot_description";
@@ -20,11 +29,18 @@ Node("arm_comm_udp")
 }
 
 
-bool ArmCommUdp::initRobotComm(const std::string &_js_topic, const std::string &_jc_topic)
+bool ArmCommUdp::initRobotComm()
 {
-  sub_js_ = this->create_subscription<sensor_msgs::msg::JointState>(_js_topic, 10, std::bind(&ArmCommUdp::js_cb, this, _1));
-  pub_jc_ = this->create_publisher<sensor_msgs::msg::JointState>(_jc_topic, 10);
+  std::string js_topic;
+  std::string jc_topic;
 
+  this->get_parameter("joint_state", js_topic);  
+  this->get_parameter("joint_command", jc_topic);
+
+
+  sub_js_ = this->create_subscription<sensor_msgs::msg::JointState>(js_topic, 10, std::bind(&ArmCommUdp::js_cb, this, _1));
+  pub_jc_ = this->create_publisher<sensor_msgs::msg::JointState>(jc_topic, 10);
+ 
   trac_ik_.reset( new TRAC_IK::TRAC_IK(shared_from_this(), base_link_, tip_link_, 
                    robot_description_, max_time_, eps_, solve_type_) );
 
@@ -33,15 +49,29 @@ bool ArmCommUdp::initRobotComm(const std::string &_js_topic, const std::string &
 }
 
 
-bool ArmCommUdp::initUdpComm(const int &_cfs_port, 
-                             const int &_robot_port)
+bool ArmCommUdp::initUdpComm()
 {
-   cfs_port_ = _cfs_port;
-   robot_port_ = _robot_port;
+  int cfs_port;
+  int robot_port;
+  std::string cfs_ip;
+  std::string robot_ip;
+    
+  this->get_parameter("cfs_port", cfs_port);  
+  this->get_parameter("robot_port", robot_port);
+  this->get_parameter("cfs_ip", cfs_ip);  
+  this->get_parameter("robot_ip", robot_ip);      
+
+  RCLCPP_INFO(this->get_logger(), "** initUdpComm: cfs port: %d cfs ip: %s robot port: %d robot ip: %s", 
+              cfs_port, cfs_ip.c_str(), robot_port, robot_ip.c_str());
+
+   cfs_port_ = cfs_port;
+   robot_port_ = robot_port;
+   cfs_ip_ = cfs_ip;
+   robot_ip_ = robot_ip;
    
    std::string error_msg;
    
-   return sm_.initializeComm(robot_port_, cfs_port_, error_msg);
+   return sm_.initializeComm(robot_port_, cfs_port_, robot_ip_, cfs_ip_, error_msg);
 }
 
 bool ArmCommUdp::initRest(const int &_tlm_ms, const int &_cmd_ms)

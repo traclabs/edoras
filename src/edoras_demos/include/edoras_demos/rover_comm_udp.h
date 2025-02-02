@@ -20,8 +20,8 @@ class RoverCommUdp : public rclcpp::Node {
 public:
 
   RoverCommUdp();
-  bool initRobotComm(const std::string &_fixed_frame, const std::string &_base_link_frame, const std::string &_cmd_vel_topic);
-  bool initUdpComm(const int &_cfs_port, const int &_robot_port);
+  bool initRobotComm();
+  bool initUdpComm();
   bool initRest(const int &_tlm_ms, const int &_cmd_ms);
   
 protected:
@@ -37,7 +37,8 @@ protected:
   SerializeRoverManual sm_;
   int cfs_port_;
   int robot_port_;
-  
+  std::string cfs_ip_;
+  std::string robot_ip_;
   
   std::string fixed_frame_;
   std::string base_link_frame_;
