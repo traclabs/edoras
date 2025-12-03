@@ -6,23 +6,12 @@ from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition, UnlessCondition
 
 def generate_launch_description():
-    declared_arguments = []
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "example_arg",
-            default_value='false',
-            description="example arg to show how to do this",
-        )
-    )
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "rviz",
-            default_value='true',
-            description="launch rviz",
-        )
-    )
-    example_arg = LaunchConfiguration("example_arg")
-    rviz = LaunchConfiguration("rviz")
+
+    launch_args = [
+        DeclareLaunchArgument("rviz", default_value="true"),
+        DeclareLaunchArgument("cfs_ip", default_value="127.0.0.1"),
+        DeclareLaunchArgument("robot_ip", default_value="127.0.0.1")      
+    ]
 
     # *****************************
     # Mars surface
@@ -105,12 +94,12 @@ def generate_launch_description():
         name="rviz2",
         output="screen",
         arguments=["-d", rviz_config_file],
-        condition=IfCondition(rviz)
+        condition=IfCondition(LaunchConfiguration("rviz"))
     )
 
-    # ***********************
-    # Arm Comm
-    # ***********************
+    # ***********************************************
+    # Rover communication with cFS and robot control
+    # ***********************************************
     robot_comm_node = Node(
         package="edoras_demos",
         executable="rover_comm_udp_node",
@@ -119,8 +108,8 @@ def generate_launch_description():
         parameters=[
          {'cfs_port': 8080},
          {'robot_port': 8585},
-         {'cfs_ip': "127.0.0.1"},
-         {'robot_ip': "127.0.0.1"}
+         {'cfs_ip': LaunchConfiguration("cfs_ip")},
+         {'robot_ip': LaunchConfiguration("robot_ip")}
         ]
     )    
 
@@ -133,6 +122,6 @@ def generate_launch_description():
         robot_comm_node
     ]
 
-    return LaunchDescription(declared_arguments + nodes_to_start)
+    return LaunchDescription(launch_args + nodes_to_start)
 
 

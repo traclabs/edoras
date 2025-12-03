@@ -2,17 +2,11 @@ import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution, FindExecutable
 from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition, UnlessCondition
-
-ARGUMENTS = [
-    DeclareLaunchArgument('rviz', default_value='true',
-                          description='rviz in Ground'),
-    DeclareLaunchArgument('odom_in_cfs', default_value='rover_app_get_robot_odom',
-                          description='topic name for odom cfs tlm'),
-]
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 # If you want to use ros2 node list, sometimes the nodes do not appear
 # https://github.com/ros2/ros2cli/issues/582
@@ -21,18 +15,22 @@ ARGUMENTS = [
 #####################################
 def generate_launch_description():
 
-  rviz = LaunchConfiguration("rviz")
   config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'rover', 'ground_bridge.yaml')
-  
-  # Bridge
-  conversion_node = Node(
-          package='conversion_tool',
-          executable='ground_conversion_node',
-          name='ground_conversion_node',
-          output='screen',
-          parameters=[config]
-          ) 
 
+  launch_args = [
+      DeclareLaunchArgument("rviz", default_value="true"),
+      DeclareLaunchArgument("bridge_config_file", default_value=config)
+  ] 
+
+  # Edoras Bridge
+  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'rover', 'ground_bridge_multihost.yaml')
+  edoras_bridge = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('conversion_tool'), 
+         'launch', 'conversion.launch.py')]),
+      launch_arguments={'config': LaunchConfiguration("bridge_config_file")}.items()
+    )  
+  
   # Send commands
   steering_node = Node(
           package='rqt_robot_steering',
@@ -51,14 +49,13 @@ def generate_launch_description():
         name="rviz2_ground",
         output="screen",
         arguments=["-d", rviz_config_file],
-        condition=IfCondition(rviz)
+        condition=IfCondition(LaunchConfiguration("rviz"))
   )  
 
-  ld = LaunchDescription(ARGUMENTS)
-  ld.add_action(conversion_node)
-  ld.add_action(steering_node)
-  ld.add_action(rviz_node)
-
-  return ld
-  
-
+  return LaunchDescription(launch_args + 
+    [
+     edoras_bridge, 
+     steering_node, 
+     rviz_node
+    ]
+  )
