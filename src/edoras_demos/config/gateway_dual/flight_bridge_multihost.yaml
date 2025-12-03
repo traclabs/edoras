@@ -17,27 +17,27 @@ flight_conversion_node:
       spacecraft_id: 0x42 # 0x42 == 66 
   
   
-    command: ['pose_tlm_1', 'pose_tlm_2']
-    telemetry: ['twist_cmd_1', 'twist_cmd_2']
+    command: ['js_tlm_1', 'js_tlm_2']
+    telemetry: ['pose_cmd_1', 'pose_cmd_2']
 
-    pose_tlm_1:
-      type: "geometry_msgs/msg/PoseStamped"
-      topic: "/robot_1/pose"
-      mid: 0x1829 # EDORAS_APP_POSE_1_FLIGHT_MID
+    js_tlm_1:
+      type: "sensor_msgs/msg/JointState"
+      topic: "/big_arm/joint_states_throttled"
+      mid: 0x1829 # EDORAS_APP_TLM_1_FLIGHT_MID
 
-    pose_tlm_2:
-      type: "geometry_msgs/msg/PoseStamped"
-      topic: "/robot_2/pose"
-      mid: 0x182A # EDORAS_APP_POSE_2_FLIGHT_MID
+    js_tlm_2:
+      type: "sensor_msgs/msg/JointState"
+      topic: "/little_arm/joint_states_throttled"
+      mid: 0x182A # EDORAS_APP_TLM_2_FLIGHT_MID
       
-    twist_cmd_1:
-      type: "geometry_msgs/msg/Twist"
-      topic: "/robot_1/cmd_vel"
-      mid: 0x82A # EDORAS_APP_TWIST_1_FLIGHT_MID 
+    pose_cmd_1:
+      type: "geometry_msgs/msg/Pose"
+      topic: "/big_arm/flight/target_pose"
+      mid: 0x82A # EDORAS_APP_CMD_1_FLIGHT_MID 
       
-    twist_cmd_2:
-      type: "geometry_msgs/msg/Twist"
-      topic: "/robot_2/cmd_vel"
-      mid: 0x82B # EDORAS_APP_TWIST_2_FLIGHT_MID
+    pose_cmd_2:
+      type: "geometry_msgs/msg/Pose"
+      topic: "/little_arm/flight/target_pose"
+      mid: 0x82B # EDORAS_APP_CMD_2_FLIGHT_MID
 
 

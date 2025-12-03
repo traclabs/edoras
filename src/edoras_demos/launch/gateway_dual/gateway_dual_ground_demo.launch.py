@@ -8,12 +8,6 @@ from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
-ARGUMENTS = [
-    DeclareLaunchArgument('rviz', default_value='true',
-                          description='Open rviz to see robot state back'),
-    DeclareLaunchArgument('odom_in_cfs', default_value='rover_app_get_robot_odom',
-                          description='topic name for odom cfs tlm'),
-]
 
 # If you want to use ros2 node list, sometimes the nodes do not appear
 # https://github.com/ros2/ros2cli/issues/582
@@ -22,18 +16,22 @@ ARGUMENTS = [
 #####################################
 def generate_launch_description():
 
-  rviz = LaunchConfiguration("rviz")
+  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'gateway_dual', 'ground_bridge.yaml')
+
+  launch_args = [
+      DeclareLaunchArgument("rviz", default_value="true"),
+      DeclareLaunchArgument("bridge_config_file", default_value=config)
+  ] 
+
 
   # ********************************
   # Conversion Bridge in Ground
   # ********************************
-  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'gateway_dual', 'ground_bridge.yaml')
-  
   edoras_bridge = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('conversion_tool'), 
          'launch', 'conversion.launch.py')]),
-      launch_arguments={'config': config,
+      launch_arguments={'config': LaunchConfiguration("bridge_config_file"),
                         'use_sim_time': 'False'}.items()
   )
   
@@ -96,7 +94,7 @@ def generate_launch_description():
         name="rviz2_ground",
         output="screen",
         arguments=["-d", rviz_config_file],
-        condition=IfCondition(rviz)
+        condition=IfCondition(LaunchConfiguration("rviz"))
   )
 
   big_arm_command = Node(
@@ -134,14 +132,9 @@ def generate_launch_description():
                   "--qx", "0.0", "--qy", "0.0", "--qz", "0.0", "--qw", "1.0"])
 
 
-  ld = LaunchDescription(ARGUMENTS)
-  ld.add_action(edoras_bridge)
-  ld.add_action(big_arm_rsp)
-  ld.add_action(little_arm_rsp)  
-  ld.add_action(rviz_node)
-  ld.add_action(little_arm_command)
-  ld.add_action(big_arm_command)
-  ld.add_action(arms_tf)
-  return ld
-  
-
+  return LaunchDescription(launch_args + 
+    [edoras_bridge, big_arm_rsp, little_arm_rsp,
+     rviz_node, little_arm_command, big_arm_command,
+     arms_tf
+    ]
+  )

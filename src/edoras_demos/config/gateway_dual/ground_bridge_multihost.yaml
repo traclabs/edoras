@@ -5,31 +5,31 @@ conversion_node:
     communication:
       bridge_port: 1235
       fsw_port: 1235	
-      fsw_ip: "10.5.0.3"
+      fsw_ip: "10.5.0.3" # fsw
       telemetry_ip: "0.0.0.0"
 
       # Phase I helper
-      bridge_ip: "10.5.0.2" # IP of the machine where this bridge is running
+      bridge_ip: "10.5.0.2" # IP of the machine where this bridge is running (rosgsw)
   
-    command: ['twist_cmd_1', 'twist_cmd_2']
-    telemetry: ['pose_tlm_1', 'pose_tlm_2']
+    command: ['pose_cmd_1', 'pose_cmd_2']
+    telemetry: ['js_tlm_1', 'js_tlm_2']
 
-    twist_cmd_1:
-      type: "geometry_msgs/msg/Twist"
-      topic: "/robot_1/ground/cmd_vel"
-      mid: 0x1827 # EDORAS_APP_TWIST_1_GROUND_MID 
+    pose_cmd_1:
+      type: "geometry_msgs/msg/Pose"
+      topic: "/big_arm/ground/target"
+      mid: 0x1827 # EDORAS_APP_CMD_1_GROUND_MID 
       
-    twist_cmd_2:
-      type: "geometry_msgs/msg/Twist"
-      topic: "/robot_2/ground/cmd_vel"
-      mid: 0x1828 # EDORAS_APP_TWIST_2_GROUND_MID
+    pose_cmd_2:
+      type: "geometry_msgs/msg/Pose"
+      topic: "/little_arm/ground/target"
+      mid: 0x1828 # EDORAS_APP_CMD_2_GROUND_MID
 
-    pose_tlm_1:
-      type: "geometry_msgs/msg/PoseStamped"
-      topic: "/robot_1/ground/pose"
-      mid: 0x828 # EDORAS_APP_POSE_1_GROUND_MID
+    js_tlm_1:
+      type: "sensor_msgs/msg/JointState"
+      topic: "/big_arm/ground/joint_states"
+      mid: 0x828 # EDORAS_APP_TLM_1_GROUND_MID
 
-    pose_tlm_2:
-      type: "geometry_msgs/msg/PoseStamped"
-      topic: "/robot_2/ground/pose"
-      mid: 0x829 # EDORAS_APP_POSE_2_GROUND_MID
+    js_tlm_2:
+      type: "sensor_msgs/msg/JointState"
+      topic: "/little_arm/ground/joint_states"
+      mid: 0x829 # EDORAS_APP_TLM_2_GROUND_MID

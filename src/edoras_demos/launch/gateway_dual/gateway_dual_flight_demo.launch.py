@@ -9,23 +9,13 @@ from ament_index_python.packages import get_package_share_directory
 import os
 
 def generate_launch_description():
-    declared_arguments = []
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "example_arg",
-            default_value='false',
-            description="example arg to show how to do this",
-        )
-    )
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "rviz",
-            default_value='true',
-            description="launch rviz",
-        )
-    )
-    example_arg = LaunchConfiguration("example_arg")
-    rviz = LaunchConfiguration("rviz")
+
+    config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'gateway_dual', 'flight_bridge.yaml')
+
+    launch_args = [
+        DeclareLaunchArgument("rviz", default_value="true"),
+        DeclareLaunchArgument("bridge_config_file", default_value=config)
+    ]    
 
     # *****************************
     # Gateway body (static)
@@ -112,11 +102,11 @@ def generate_launch_description():
         name="rviz2_flight",
         output="screen",
         arguments=["-d", rviz_config_file],
-        condition=IfCondition(rviz)
+        condition=IfCondition(LaunchConfiguration("rviz"))
     )
 
     # ***********************
-    # Arm Comm
+    # Arms Control
     # ***********************
     big_arm_ik_node = Node(
         package="edoras_demos",
@@ -154,15 +144,15 @@ def generate_launch_description():
         namespace="little_arm"
     )    
 
-
+    # ***********************
     # Edoras Bridge
-    config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'gateway_dual', 'flight_bridge.yaml')
-
+    # ***********************
     edoras_bridge = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('conversion_tool'), 
          'launch', 'flight_conversion.launch.py')]),
-      launch_arguments={'config': config, 'use_sim_time': 'False'}.items()
+      launch_arguments={'config': LaunchConfiguration("bridge_config_file"), 
+                        'use_sim_time': 'False'}.items()
     )
 
     nodes_to_start = [
@@ -177,6 +167,6 @@ def generate_launch_description():
         edoras_bridge
     ]
 
-    return LaunchDescription(declared_arguments + nodes_to_start)
+    return LaunchDescription(launch_args + nodes_to_start)
 
 
