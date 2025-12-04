@@ -23,7 +23,6 @@ def generate_launch_description():
       DeclareLaunchArgument("bridge_config_file", default_value=config)
   ] 
 
-
   # ********************************
   # Conversion Bridge in Ground
   # ********************************

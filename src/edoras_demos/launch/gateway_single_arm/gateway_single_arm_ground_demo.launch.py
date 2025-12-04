@@ -2,17 +2,11 @@ import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution, FindExecutable
 from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition, UnlessCondition
-
-ARGUMENTS = [
-    DeclareLaunchArgument('rviz', default_value='true',
-                          description='Open rviz to see robot state back'),
-    DeclareLaunchArgument('odom_in_cfs', default_value='rover_app_get_robot_odom',
-                          description='topic name for odom cfs tlm'),
-]
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 # If you want to use ros2 node list, sometimes the nodes do not appear
 # https://github.com/ros2/ros2cli/issues/582
@@ -21,19 +15,22 @@ ARGUMENTS = [
 #####################################
 def generate_launch_description():
 
-  rviz = LaunchConfiguration("rviz")
+  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'gateway_single_arm', 'ground_bridge.yaml')
+
+  launch_args = [
+      DeclareLaunchArgument("rviz", default_value="true"),
+      DeclareLaunchArgument("bridge_config_file", default_value=config)
+  ] 
 
   # ********************************
   # Conversion Bridge in Ground
   # ********************************
-  config = os.path.join(get_package_share_directory('edoras_demos'), 'config', 'gateway', 'ground_bridge.yaml')
-  conversion_node = Node(
-          package='conversion_tool',
-          executable='ground_conversion_node',
-          name='ground_conversion_node',
-          output='screen',
-          parameters=[config]
-          ) 
+  edoras_bridge = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('conversion_tool'), 
+         'launch', 'conversion.launch.py')]),
+      launch_arguments={'config': LaunchConfiguration("bridge_config_file")}.items()
+    )
 
   # **************************
   #  Big Arm
@@ -69,22 +66,26 @@ def generate_launch_description():
         name="rviz2_ground",
         output="screen",
         arguments=["-d", rviz_config_file],
-        condition=IfCondition(rviz)
+        condition=IfCondition(LaunchConfiguration("rviz"))
   )
 
+  # ****************************************
+  # Node to send commands using the gimbal
+  # ****************************************  
   arm_command_node = Node(
           package='edoras_demos',
           executable='arm_ground_command',
           name='arm_ground_command',
-          output='screen'
+          output='screen',
+          parameters=[
+            {'output_topic': 'command_pose'}],
           ) 
 
-  ld = LaunchDescription(ARGUMENTS)
-  ld.add_action(conversion_node)
-  ld.add_action(big_arm_rsp)
-  ld.add_action(rviz_node)
-  ld.add_action(arm_command_node)
-
-  return ld
-  
-
+  return LaunchDescription(launch_args + 
+    [
+     edoras_bridge,
+     big_arm_rsp,
+     rviz_node,
+     arm_command_node    
+    ]
+  )  
